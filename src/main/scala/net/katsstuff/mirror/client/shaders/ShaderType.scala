@@ -18,15 +18,12 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package net.katsstuff.mirror.client.lib;
+package net.katsstuff.mirror.client.shaders
 
-import net.katsstuff.mirror.Mirror;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.renderer.OpenGlHelper
 
-public class LibParticleTexures {
-
-	public static final ResourceLocation PARTICLE_GLINT = Mirror.resource("entity/particle/particle_glint");
-	public static final ResourceLocation PARTICLE_GLOW = Mirror.resource("entity/particle/particle_glow");
-	public static final ResourceLocation PARTICLE_MOTE = Mirror.resource("entity/particle/particle_mote");
-	public static final ResourceLocation PARTICLE_STAR = Mirror.resource("entity/particle/particle_star");
+sealed abstract case class ShaderType(constant: Int, extension: String)
+object ShaderType {
+  object Vertex   extends ShaderType(OpenGlHelper.GL_VERTEX_SHADER, "vsh")
+  object Fragment extends ShaderType(OpenGlHelper.GL_FRAGMENT_SHADER, "fsh")
 }
