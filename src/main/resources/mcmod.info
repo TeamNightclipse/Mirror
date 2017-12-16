@@ -1,0 +1,15 @@
+[
+{
+  "modid": "mirror",
+  "name": "Mirror",
+  "description": "A rendering library with lot's of fancy effects.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Katrix", "Arekkuusu"],
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
