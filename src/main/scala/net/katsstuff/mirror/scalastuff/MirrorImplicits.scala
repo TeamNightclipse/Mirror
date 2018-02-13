@@ -21,7 +21,7 @@
 package net.katsstuff.mirror.scalastuff
 
 import java.util.Optional
-import java.util.function.{Consumer => JConsumer, Function => JFunction, Predicate => JPredicate, Supplier => JSupplier}
+import java.util.function.{BooleanSupplier, Consumer => JConsumer, Function => JFunction, Predicate => JPredicate, Supplier => JSupplier}
 
 import scala.collection.JavaConverters._
 import scala.reflect.ClassTag
@@ -57,6 +57,10 @@ object MirrorImplicits {
 
   implicit class RichSupplier[A](val supplier: JSupplier[A]) extends AnyVal {
     def asScala: () => A = () => supplier.get()
+  }
+
+  implicit class RichBooleanSupplier(val supplier: BooleanSupplier) extends AnyVal {
+    def asScala: () => Boolean = () => supplier.getAsBoolean
   }
 
   implicit class RichJFunction[A, B](val function: JFunction[A, B]) extends AnyVal {
