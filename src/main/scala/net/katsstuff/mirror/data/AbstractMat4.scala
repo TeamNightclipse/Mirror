@@ -20,8 +20,8 @@
  */
 package net.katsstuff.mirror.data
 
-sealed trait AbstractMat4 {
-  type Self <: AbstractMat4
+sealed trait AbstractMat4 { self =>
+  type Self <: AbstractMat4 { type Self = self.Self }
 
   def m00: Double
   def m01: Double

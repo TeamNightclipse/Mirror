@@ -18,14 +18,17 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package net.katsstuff.mirror.client.shaders
+package net.katsstuff.mirror.network
 
-import net.minecraft.client.renderer.OpenGlHelper
+import net.katsstuff.mirror.Mirror
+import net.katsstuff.mirror.network.scalachannel.ScalaNetworkWrapper
 
-sealed abstract case class ShaderType(constant: Int, extension: String) {
-  def instance: ShaderType = this
-}
-object ShaderType {
-  object Vertex   extends ShaderType(OpenGlHelper.GL_VERTEX_SHADER, "vsh")
-  object Fragment extends ShaderType(OpenGlHelper.GL_FRAGMENT_SHADER, "fsh")
+object MirrorPacketHandler extends ScalaNetworkWrapper(Mirror.Id) {
+  private[mirror] def load(): Unit = {
+    registerMessages {
+      for {
+        _ <- registerMessage[ParticlePacket]
+      } yield ()
+    }
+  }
 }

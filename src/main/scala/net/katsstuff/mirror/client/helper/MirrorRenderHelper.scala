@@ -79,39 +79,39 @@ object MirrorRenderHelper {
 
     cylinderHighId = createList {
       GlStateManager.translate(0F, 0F, -0.5F)
-      cylinder.draw(1F, 1F, 1F, 16, 1)
+      cylinder.draw(1F, 1F, 1F, 32, 1)
       GlStateManager.translate(0F, 0F, 0.5F)
     }
     cylinderMidId = createList {
       GlStateManager.translate(0F, 0F, -0.5F)
-      cylinder.draw(1F, 1F, 1F, 8, 1)
+      cylinder.draw(1F, 1F, 1F, 16, 1)
       GlStateManager.translate(0F, 0F, 0.5F)
     }
     cylinderLowId = createList {
       GlStateManager.translate(0F, 0F, -0.5F)
-      cylinder.draw(1F, 1F, 1F, 4, 1)
+      cylinder.draw(1F, 1F, 1F, 8, 1)
       GlStateManager.translate(0F, 0F, 0.5F)
     }
 
     coneHighId = createList {
       GlStateManager.translate(0F, 0F, -0.5F)
-      cone.draw(1F, 0F, 1F, 16, 1)
+      cone.draw(1F, 0F, 1F, 32, 1)
       GlStateManager.translate(0F, 0F, 0.5F)
     }
     coneMidId = createList {
       GlStateManager.translate(0F, 0F, -0.5F)
-      cone.draw(1F, 0F, 1F, 8, 1)
+      cone.draw(1F, 0F, 1F, 16, 1)
       GlStateManager.translate(0F, 0F, 0.5F)
     }
     coneLowId = createList {
       GlStateManager.translate(0F, 0F, -0.5F)
-      cone.draw(1F, 0F, 1F, 4, 1)
+      cone.draw(1F, 0F, 1F, 8, 1)
       GlStateManager.translate(0F, 0F, 0.5F)
     }
 
-    diskHighId = createList(disk.draw(1F, 0F, 16, 1))
-    diskMidId = createList(disk.draw(1F, 0F, 8, 1))
-    diskLowId = createList(disk.draw(1F, 0F, 4, 1))
+    diskHighId = createList(disk.draw(1F, 0F, 32, 1))
+    diskMidId = createList(disk.draw(1F, 0F, 16, 1))
+    diskLowId = createList(disk.draw(1F, 0F, 8, 1))
   }
 
   def createList(create: => Unit): Int = {

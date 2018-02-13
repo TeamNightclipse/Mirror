@@ -25,7 +25,7 @@ import scala.collection.JavaConverters._
 import org.lwjgl.opengl.GL11._
 import org.lwjgl.opengl.GL20._
 
-import net.katsstuff.mirror.helper.LogHelper
+import net.katsstuff.mirror.helper.MirrorLogHelper
 import net.minecraft.client.renderer.vertex.VertexFormatElement.EnumUsage._
 import net.minecraft.client.renderer.vertex.{VertexFormat, VertexFormatElement}
 import net.minecraft.client.renderer.{GlStateManager, OpenGlHelper}
@@ -78,7 +78,7 @@ case class VBOModel(format: VertexFormat, arrayBuffer: MirrorArrayBuffer, vertex
       case GENERIC =>
         glEnableVertexAttribArray(attr.getIndex)
         glVertexAttribPointer(attr.getIndex, count, tpe, false, stride, offset)
-      case _ => LogHelper.fatal(s"Unimplemented vanilla attribute upload: ${usage.getDisplayName}")
+      case _ => MirrorLogHelper.fatal(s"Unimplemented vanilla attribute upload: ${usage.getDisplayName}")
     }
   }
 
@@ -100,7 +100,7 @@ case class VBOModel(format: VertexFormat, arrayBuffer: MirrorArrayBuffer, vertex
       case PADDING =>
       case GENERIC =>
         glDisableVertexAttribArray(attr.getIndex)
-      case _ => LogHelper.fatal(s"Unimplemented vanilla attribute upload: ${usage.getDisplayName}")
+      case _ => MirrorLogHelper.fatal(s"Unimplemented vanilla attribute upload: ${usage.getDisplayName}")
     }
   }
 }

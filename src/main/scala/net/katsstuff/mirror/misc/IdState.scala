@@ -18,14 +18,22 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package net.katsstuff.mirror.client.shaders
+package net.katsstuff.mirror.misc
 
-import net.minecraft.client.renderer.OpenGlHelper
+case class IdState[A](run: Int => (Int, A)) {
 
-sealed abstract case class ShaderType(constant: Int, extension: String) {
-  def instance: ShaderType = this
+  def map[B](f: A => B): IdState[B] = IdState { i =>
+    val (newId, a) = run(i)
+    (newId, f(a))
+  }
+
+  def flatMap[B](f: A => IdState[B]): IdState[B] = IdState { i =>
+    val (newId, a) = run(i)
+    f(a) run newId
+  }
 }
-object ShaderType {
-  object Vertex   extends ShaderType(OpenGlHelper.GL_VERTEX_SHADER, "vsh")
-  object Fragment extends ShaderType(OpenGlHelper.GL_FRAGMENT_SHADER, "fsh")
+
+object IdState {
+  def init: IdState[Int] = IdState(i => (i, i))
+  def run0[A](state: IdState[A]): A = state.run(0)._2
 }

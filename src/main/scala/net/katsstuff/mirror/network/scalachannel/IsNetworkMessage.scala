@@ -18,14 +18,12 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package net.katsstuff.mirror.client.shaders
+package net.katsstuff.mirror.network.scalachannel
 
-import net.minecraft.client.renderer.OpenGlHelper
+import scala.annotation.implicitNotFound
 
-sealed abstract case class ShaderType(constant: Int, extension: String) {
-  def instance: ShaderType = this
-}
-object ShaderType {
-  object Vertex   extends ShaderType(OpenGlHelper.GL_VERTEX_SHADER, "vsh")
-  object Fragment extends ShaderType(OpenGlHelper.GL_FRAGMENT_SHADER, "fsh")
-}
+@implicitNotFound("Could not prove that ${A} can be sent to the client")
+trait HasClientHandler[-A]
+
+@implicitNotFound("Could not prove that ${A} can be sent to the server")
+trait HasServerHandler[-A]

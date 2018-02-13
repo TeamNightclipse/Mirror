@@ -8,13 +8,6 @@ import org.gradle.jvm.tasks.Jar
 import java.util.Properties
 
 buildscript {
-    repositories {
-        jcenter()
-        maven {
-            name = "forge"
-            setUrl("http://files.minecraftforge.net/maven")
-        }
-    }
     dependencies {
         classpath("net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT")
     }
@@ -49,7 +42,7 @@ tasks.withType<ScalaCompile> {
 
 version = "${config["mc_version"]}-${config["version"]}-${config["build_number"]}"
 group = "net.katsstuff"
-base.archivesBaseName = "danmakucore"
+base.archivesBaseName = "mirror"
 
 val mainSourceSet = java.sourceSets.get("main")
 val javaSourceSet = mainSourceSet.java
@@ -63,7 +56,7 @@ val minecraft = the<ForgeExtension>()
 
 configure<ForgeExtension> {
     version = "${config["mc_version"]}-${config["forge_version"]}"
-    runDir = if (file("../run1.11").exists()) "../run1.11" else "run"
+    runDir = if (file("../run1.12").exists()) "../run1.12" else "run"
 
     // the mappings can be changed at any time, and must be in the following format.
     // snapshot_YYYYMMDD   snapshot are built nightly.
@@ -77,8 +70,25 @@ configure<ForgeExtension> {
     replaceIn("Mirror.scala")
 }
 
-tasks.withType<Jar> {
-    exclude("**/*.psd")
+val reobf: NamedDomainObjectContainer<IReobfuscator> by extensions
+
+reobf {
+    "jar" {
+        extraLines.add("PK: shapeless net/katsstuff/mirror/shade/shapeless")
+    }
+}
+
+val shade by configurations.creating
+configurations.compile.extendsFrom(shade)
+
+dependencies {
+    shade("com.chuusai:shapeless_2.11:2.3.2") {
+        exclude(group = "org.scala-lang")
+    }
+
+    testCompile("junit:junit:4.12")
+    testCompile("org.scalatest:scalatest_2.11:3.0.1")
+    testCompile("org.scalacheck:scalacheck_2.11:1.13.4")
 }
 
 tasks.withType<ProcessResources> {

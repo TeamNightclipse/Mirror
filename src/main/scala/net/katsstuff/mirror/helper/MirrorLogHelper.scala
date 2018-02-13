@@ -24,7 +24,7 @@ import org.apache.logging.log4j.{Level, LogManager, Logger}
 
 import net.katsstuff.mirror.Mirror
 
-object LogHelper {
+object MirrorLogHelper {
   //We use a separate logger until we receive one from Forge
   private var log = LogManager.getLogger(Mirror.Id)
 

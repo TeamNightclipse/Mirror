@@ -30,12 +30,12 @@ import net.minecraft.entity.Entity
 import net.minecraft.util.math.MathHelper
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
-abstract sealed class AbstractQuat {
+abstract sealed class AbstractQuat { self =>
 
   /**
 		* The type of this quat
 		*/
-  type Self <: AbstractQuat
+  type Self <: AbstractQuat { type Self = self.Self }
 
   /**
 		* The x component

@@ -18,14 +18,19 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package net.katsstuff.mirror.client.shaders
+package net.katsstuff.mirror.network.scalachannel
 
-import net.minecraft.client.renderer.OpenGlHelper
+import net.katsstuff.mirror.data.Vector3
+import net.minecraft.entity.Entity
+import net.minecraftforge.fml.common.network.NetworkRegistry
 
-sealed abstract case class ShaderType(constant: Int, extension: String) {
-  def instance: ShaderType = this
+case class TargetPoint(dimension: Int, x: Double, y: Double, z: Double, range: Double) {
+  def toMinecraft: NetworkRegistry.TargetPoint = new NetworkRegistry.TargetPoint(dimension, x, y, z, range)
 }
-object ShaderType {
-  object Vertex   extends ShaderType(OpenGlHelper.GL_VERTEX_SHADER, "vsh")
-  object Fragment extends ShaderType(OpenGlHelper.GL_FRAGMENT_SHADER, "fsh")
+object TargetPoint {
+  def around(entity: Entity, range: Double): TargetPoint =
+    TargetPoint(entity.dimension, entity.posX, entity.posY, entity.posZ, range)
+
+  def around(dimension: Int, pos: Vector3, range: Double): TargetPoint =
+    TargetPoint(dimension, pos.x, pos.y, pos.z, range)
 }

@@ -26,7 +26,7 @@ import org.apache.commons.io.IOUtils
 import org.apache.commons.lang3.StringUtils
 import org.lwjgl.BufferUtils
 
-import net.katsstuff.mirror.helper.LogHelper
+import net.katsstuff.mirror.helper.MirrorLogHelper
 import net.minecraft.client.renderer.OpenGlHelper
 import net.minecraft.client.resources.{IResource, IResourceManager}
 import net.minecraft.util.ResourceLocation
@@ -45,7 +45,7 @@ case class MirrorShader(id: Int, shaderType: ShaderType) {
 }
 object MirrorShader {
 
-  private val Include = """#pragma include "(.+)"""".r
+  private val Include = """#pragma Mirror include "(.+)"""".r
 
   def missingShader(tpe: ShaderType) = MirrorShader(0, tpe)
 
@@ -57,7 +57,6 @@ object MirrorShader {
       resourceManager: IResourceManager
   ): MirrorShader = {
     val shaderSource = parseShader(location, resourceManager).mkString("\n")
-    LogHelper.info(s"Shader source:\n$shaderSource")
 
     val buffer = BufferUtils.createByteBuffer(shaderSource.length)
     buffer.put(shaderSource.getBytes)

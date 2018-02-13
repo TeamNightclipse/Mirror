@@ -30,12 +30,12 @@ import net.katsstuff.mirror.scalastuff.MirrorImplicits._
 import net.minecraft.entity.{Entity, EntityLivingBase}
 import net.minecraft.util.math.{BlockPos, MathHelper, Vec3d}
 
-sealed trait AbstractVector3 extends Any {
+sealed trait AbstractVector3 extends Any { self =>
 
   /**
 		* The type of this vector
 		*/
-  type Self <: AbstractVector3
+  type Self <: AbstractVector3 { type Self = self.Self }
 
   /**
 		* The x component
@@ -258,7 +258,7 @@ sealed trait AbstractVector3 extends Any {
     create(x + alpha * (target.x - x), y + alpha * (target.y - y), z + alpha * (target.z - z))
 
   //From libgdx
-  def slerp(target: AbstractVector3, alpha: Double): Self#Self = {
+  def slerp(target: AbstractVector3, alpha: Double): Self = {
     val dotProd = this.dot(target)
 
     if (Math.abs(dotProd) > 0.9995) lerp(target, alpha).normalize

@@ -26,7 +26,7 @@ import scala.collection.mutable
 import scala.util.control.NonFatal
 
 import net.katsstuff.mirror.client.helper.MirrorRenderHelper
-import net.katsstuff.mirror.helper.LogHelper
+import net.katsstuff.mirror.helper.MirrorLogHelper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.resources.{IResourceManager, IResourceManagerReloadListener}
 import net.minecraft.crash.CrashReport
@@ -52,10 +52,10 @@ class ShaderManager(resourceManager: IResourceManager) extends IResourceManagerR
       MirrorShader.compileShader(location, shaderType, resourceManager)
     } catch {
       case e: IOException =>
-        LogHelper.warn(s"Failed to load shader: $location", e)
+        MirrorLogHelper.warn(s"Failed to load shader: $location", e)
         MirrorShader.missingShader(shaderType)
       case e: ShaderException =>
-        LogHelper.warn(s"Failed to compile shader: $location", e)
+        MirrorLogHelper.warn(s"Failed to compile shader: $location", e)
         MirrorShader.missingShader(shaderType)
     }
   }
@@ -86,7 +86,7 @@ class ShaderManager(resourceManager: IResourceManager) extends IResourceManagerR
       MirrorShaderProgram.create(newShaders, uniforms, strictUniforms)
     } catch {
       case e: ShaderException =>
-        LogHelper.warn(s"Failed to create shader: $shaders", e)
+        MirrorLogHelper.warn(s"Failed to create shader: $shaders", e)
         MirrorShaderProgram.missingShaderProgram(newShaders.values.toSeq, uniforms)
       case NonFatal(throwable) =>
         val crashReport         = CrashReport.makeCrashReport(throwable, "Registering shaders")

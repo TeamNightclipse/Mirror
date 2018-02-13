@@ -18,55 +18,34 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package net.katsstuff.mirror.client.particles
+package net.katsstuff.mirror.network.scalachannel
 
-import java.util.Random
-
-import net.katsstuff.mirror.Mirror
-import net.katsstuff.mirror.data.Vector3
 import net.minecraft.client.Minecraft
-import net.minecraft.world.World
+import net.minecraft.client.network.NetHandlerPlayClient
+import net.minecraft.network.{INetHandler, NetHandlerPlayServer}
+import net.minecraft.util.IThreadListener
+import net.minecraftforge.fml.common.FMLCommonHandler
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
-object ParticleUtil {
-  private val random  = new Random
-  private var counter = 0
+sealed trait MessageHandler[-A, Reply] {
 
+  def handle(netHandler: INetHandler, a: A): Option[Reply]
+
+  def side: Side
+  def scheduler: IThreadListener
+}
+
+trait ClientMessageHandler[A, Reply] extends MessageHandler[A, Reply] with HasClientHandler[A] {
   @SideOnly(Side.CLIENT)
-  def spawnParticleGlow(
-      world: World,
-      pos: Vector3,
-      motion: Vector3,
-      r: Float,
-      g: Float,
-      b: Float,
-      scale: Float,
-      lifetime: Int,
-      texture: GlowTexture
-  ): Unit = {
-    counter += random.nextInt(3)
-    val particleSetting = Minecraft.getMinecraft.gameSettings.particleSetting
-    val particleComp = if (particleSetting == 0) 1 else 2 * particleSetting
-    if (counter % particleComp == 0) {
-      Mirror.proxy.addParticle(new ParticleGlow(world, pos, motion, r, g, b, scale, lifetime, texture))
-    }
-  }
+  def handle(netHandler: NetHandlerPlayClient, a: A): Option[Reply]
+  override def handle(netHandler: INetHandler, a: A): Option[Reply] = handle(netHandler.asInstanceOf[NetHandlerPlayClient], a)
+  override def side: Side = Side.CLIENT
+  override def scheduler: IThreadListener = Minecraft.getMinecraft
+}
 
-  def spawnParticleGlowPacket(
-      world: World,
-      pos: Vector3,
-      motion: Vector3,
-      r: Float,
-      g: Float,
-      b: Float,
-      scale: Float,
-      lifetime: Int,
-      texture: GlowTexture,
-      range: Int
-  ): Unit =
-    MirrorPacketHandler
-      .sendToAllAround(
-        new ParticlePacket(pos, motion, r, g, b, scale, lifetime, texture),
-        TargetPoint.around(world.provider.getDimension, pos, range)
-      )
+trait ServerMessageHandler[A, Reply] extends MessageHandler[A, Reply] with HasServerHandler[A] {
+  def handle(netHandler: NetHandlerPlayServer, a: A): Option[Reply]
+  override def handle(netHandler: INetHandler, a: A): Option[Reply] = handle(netHandler.asInstanceOf[NetHandlerPlayServer], a)
+  override def side: Side = Side.SERVER
+  override def scheduler: IThreadListener = FMLCommonHandler.instance().getMinecraftServerInstance
 }
