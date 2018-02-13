@@ -27,14 +27,11 @@ import net.minecraftforge.common.MinecraftForge
 
 class ClientProxy extends CommonProxy {
 
-  private val particleRenderer = new ParticleRenderer
+  val particleRenderer = new ParticleRenderer
 
   override def bakeRenderModels(): Unit = MirrorRenderHelper.bakeModels()
 
   override def registerRenderers(): Unit = {
     MinecraftForge.EVENT_BUS.register(particleRenderer)
   }
-
-  override def addParticle[T <: IGlowParticle](particle: T): Unit =
-    particleRenderer.addParticle(particle)
 }

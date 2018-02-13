@@ -20,12 +20,7 @@
  */
 package net.katsstuff.mirror
 
-import net.katsstuff.mirror.client.particles.IGlowParticle
-
 class CommonProxy {
   def bakeRenderModels():  Unit = ()
   def registerRenderers(): Unit = ()
-
-  def addParticle[T <: IGlowParticle](particle: T): Unit = ()
-
 }

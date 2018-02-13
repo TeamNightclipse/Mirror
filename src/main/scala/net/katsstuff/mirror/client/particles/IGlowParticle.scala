@@ -37,6 +37,8 @@ trait IGlowParticle {
       rotationXZ: Float
   ): Unit
 
+  def shouldRender: Boolean = true
+
   def isAdditive:  Boolean
   def ignoreDepth: Boolean
   def alive:       Boolean

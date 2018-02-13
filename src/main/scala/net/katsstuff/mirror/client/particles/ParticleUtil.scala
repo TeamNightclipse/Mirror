@@ -23,7 +23,10 @@ package net.katsstuff.mirror.client.particles
 import java.util.Random
 
 import net.katsstuff.mirror.Mirror
+import net.katsstuff.mirror.client.ClientProxy
 import net.katsstuff.mirror.data.Vector3
+import net.katsstuff.mirror.network.scalachannel.TargetPoint
+import net.katsstuff.mirror.network.{MirrorPacketHandler, ParticlePacket}
 import net.minecraft.client.Minecraft
 import net.minecraft.world.World
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
@@ -46,9 +49,12 @@ object ParticleUtil {
   ): Unit = {
     counter += random.nextInt(3)
     val particleSetting = Minecraft.getMinecraft.gameSettings.particleSetting
-    val particleComp = if (particleSetting == 0) 1 else 2 * particleSetting
+    val particleComp    = if (particleSetting == 0) 1 else 2 * particleSetting
     if (counter % particleComp == 0) {
-      Mirror.proxy.addParticle(new ParticleGlow(world, pos, motion, r, g, b, scale, lifetime, texture))
+      Mirror.proxy
+        .asInstanceOf[ClientProxy]
+        .particleRenderer
+        .addParticle(new ParticleGlow(world, pos, motion, r, g, b, scale, lifetime, texture))
     }
   }
 

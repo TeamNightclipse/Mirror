@@ -24,6 +24,7 @@ import scala.collection.mutable.ArrayBuffer
 
 import org.lwjgl.opengl.GL11
 
+import net.katsstuff.mirror.client.helper.BlendHelper
 import net.katsstuff.mirror.client.lib.LibParticleTexures
 import net.minecraft.client.Minecraft
 import net.minecraft.client.particle.Particle
@@ -49,7 +50,8 @@ class ParticleRenderer {
   }
 
   @SubscribeEvent(priority = EventPriority.HIGHEST)
-  def onTick(event: TickEvent.ClientTickEvent): Unit = if (event.side == Side.CLIENT) updateParticles()
+  def onTick(event: TickEvent.ClientTickEvent): Unit =
+    if (event.side == Side.CLIENT && !Minecraft.getMinecraft.isGamePaused) updateParticles()
 
   @SubscribeEvent @SideOnly(Side.CLIENT)
   def onRenderAfterWorld(event: RenderWorldLastEvent): Unit = {
@@ -60,7 +62,7 @@ class ParticleRenderer {
 
   private def updateParticles(): Unit = {
     val toRemove = for (particle <- particles) yield {
-      if (particle != null && particle.alive) {
+      if (particle.alive) {
         particle.onUpdateGlow()
         None
       } else Some(particle)
@@ -72,11 +74,11 @@ class ParticleRenderer {
   private def renderParticles(partialTicks: Float): Unit = {
     val player = Minecraft.getMinecraft.player
     if (player != null) {
-      val f  = ActiveRenderInfo.getRotationX
-      val f1 = ActiveRenderInfo.getRotationZ
-      val f2 = ActiveRenderInfo.getRotationYZ
-      val f3 = ActiveRenderInfo.getRotationXY
-      val f4 = ActiveRenderInfo.getRotationXZ
+      val x  = ActiveRenderInfo.getRotationX
+      val z  = ActiveRenderInfo.getRotationZ
+      val yz = ActiveRenderInfo.getRotationYZ
+      val xy = ActiveRenderInfo.getRotationXY
+      val xz = ActiveRenderInfo.getRotationXZ
 
       Particle.interpPosX = player.lastTickPosX + (player.posX - player.lastTickPosX) * partialTicks
       Particle.interpPosY = player.lastTickPosY + (player.posY - player.lastTickPosY) * partialTicks
@@ -85,7 +87,7 @@ class ParticleRenderer {
 
       GlStateManager.enableAlpha()
       GlStateManager.enableBlend()
-      GlStateManager.alphaFunc(GL11.GL_ALWAYS, 0)
+      GlStateManager.alphaFunc(516, 0.003921569F)
       GlStateManager.disableCull()
       GlStateManager.disableLighting()
       GlStateManager.depthMask(false)
@@ -94,24 +96,32 @@ class ParticleRenderer {
       val tess   = Tessellator.getInstance
       val buffer = tess.getBuffer
 
-      GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA)
+      BlendHelper.Normal.blend()
       buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP)
-      for (particle <- particles if particle != null && !particle.isAdditive) {
-        particle.renderParticleGlow(buffer, player, partialTicks, f, f4, f1, f2, f3)
+      for (particle <- particles if particle.shouldRender && !particle.isAdditive) {
+        particle.renderParticleGlow(buffer, player, partialTicks, x, xz, z, yz, xy)
       }
       tess.draw()
 
-      GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE)
+      BlendHelper.AdditiveAlpha.blend()
       buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP)
-      for (particle <- particles if particle != null && particle.isAdditive) {
-        particle.renderParticleGlow(buffer, player, partialTicks, f, f4, f1, f2, f3)
+      for (particle <- particles if particle.shouldRender && particle.isAdditive) {
+        particle.renderParticleGlow(buffer, player, partialTicks, x, xz, z, yz, xy)
       }
       tess.draw()
 
       GlStateManager.disableDepth()
+      BlendHelper.Normal.blend()
       buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP)
-      for (particle <- particles if particle != null && particle.ignoreDepth) {
-        particle.renderParticleGlow(buffer, player, partialTicks, f, f4, f1, f2, f3)
+      for (particle <- particles if particle.shouldRender && particle.ignoreDepth && !particle.isAdditive) {
+        particle.renderParticleGlow(buffer, player, partialTicks, x, xz, z, yz, xy)
+      }
+      tess.draw()
+
+      BlendHelper.AdditiveAlpha.blend()
+      buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP)
+      for (particle <- particles if particle.shouldRender && particle.ignoreDepth && particle.isAdditive) {
+        particle.renderParticleGlow(buffer, player, partialTicks, x, xz, z, yz, xy)
       }
       tess.draw()
 
@@ -124,5 +134,8 @@ class ParticleRenderer {
     }
   }
 
-  def addParticle(particle: IGlowParticle): Unit = particles += particle
+  def addParticle(particle: IGlowParticle): Unit = {
+    require(particle != null, "Null particle")
+    particles += particle
+  }
 }
