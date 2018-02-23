@@ -107,10 +107,3 @@ case class Condition(
 object Condition {
   implicit def implicitApply(condition: Condition): Tooltip = condition.apply
 }
-
-object Test {
-  Tooltip
-    .add("foo").add("bar").newline
-    .when(5 == 5).ifTrue(_.add("baz")).orElse(_.add("bin")).newline
-    .add("foo").lines
-}

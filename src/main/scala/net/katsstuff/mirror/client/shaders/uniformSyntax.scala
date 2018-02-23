@@ -26,7 +26,9 @@ import org.lwjgl.util.vector.{Matrix2f, Matrix3f, Matrix4f}
 
 class UniformSyntax(val program: MirrorShaderProgram) extends AnyVal with Dynamic {
 
-  def selectDynamic[A <: UniformType](name: String)(implicit mkSyntax: UniformTypeMkSyntax[A], tpe: A): mkSyntax.Syntax = {
+  def selectDynamic[A <: UniformType](
+      name: String
+  )(implicit mkSyntax: UniformTypeMkSyntax[A], tpe: A): mkSyntax.Syntax = {
     val uniform = program.getUniform(name).filter(_.tpe == tpe).getOrElse(new NOOPUniform(tpe, 1))
     mkSyntax.mkSyntax(uniform)
   }
@@ -44,62 +46,51 @@ object UniformTypeMkSyntax {
   }
 
   class IntSyntax(val uniform: MirrorUniform) extends AnyVal with UniformSyntaxCommon {
-    def set(i: Int): Unit = uniform.set(i)
+    def set(i: Int):              Unit = uniform.set(i)
     def setIdx(i: Int, idx: Int): Unit = uniform.setIdx(i, idx)
   }
 
   class IVec2Syntax(val uniform: MirrorUniform) extends AnyVal with UniformSyntaxCommon {
-    def set(i1: Int, i2: Int): Unit = uniform.set(i1, i2)
+    def set(i1: Int, i2: Int):              Unit = uniform.set(i1, i2)
     def setIdx(i1: Int, i2: Int, idx: Int): Unit = uniform.setIdx(i1, i2, idx)
   }
 
   class IVec3Syntax(val uniform: MirrorUniform) extends AnyVal with UniformSyntaxCommon {
-    def set(i1: Int, i2: Int, i3: Int): Unit = uniform.set(i1, i2, i3)
+    def set(i1: Int, i2: Int, i3: Int):              Unit = uniform.set(i1, i2, i3)
     def setIdx(i1: Int, i2: Int, i3: Int, idx: Int): Unit = uniform.setIdx(i1, i2, i3, idx)
   }
 
   class IVec4Syntax(val uniform: MirrorUniform) extends AnyVal with UniformSyntaxCommon {
-    def set(i1: Int, i2: Int, i3: Int, i4: Int): Unit = uniform.set(i1, i2, i3, i4)
+    def set(i1: Int, i2: Int, i3: Int, i4: Int):              Unit = uniform.set(i1, i2, i3, i4)
     def setIdx(i1: Int, i2: Int, i3: Int, i4: Int, idx: Int): Unit = uniform.setIdx(i1, i2, i3, i4, idx)
   }
 
   class FloatSyntax(val uniform: MirrorUniform) extends AnyVal with UniformSyntaxCommon {
-    def set(f: Float): Unit = uniform.set(f)
+    def set(f: Float):              Unit = uniform.set(f)
     def setIdx(f: Float, idx: Int): Unit = uniform.setIdx(f, idx)
   }
 
   class Vec2Syntax(val uniform: MirrorUniform) extends AnyVal with UniformSyntaxCommon {
-    def set(f1: Float, f2: Float): Unit = uniform.set(f1, f2)
+    def set(f1: Float, f2: Float):              Unit = uniform.set(f1, f2)
     def setIdx(f1: Float, f2: Float, idx: Int): Unit = uniform.setIdx(f1, f2, idx)
   }
 
   class Vec3Syntax(val uniform: MirrorUniform) extends AnyVal with UniformSyntaxCommon {
-    def set(f1: Float, f2: Float, f3: Float): Unit = uniform.set(f1, f2, f3)
+    def set(f1: Float, f2: Float, f3: Float):              Unit = uniform.set(f1, f2, f3)
     def setIdx(f1: Float, f2: Float, f3: Float, idx: Int): Unit = uniform.setIdx(f1, f2, f3, idx)
   }
 
   class Vec4Syntax(val uniform: MirrorUniform) extends AnyVal with UniformSyntaxCommon {
-    def set(f1: Float, f2: Float, f3: Float, f4: Float): Unit = uniform.set(f1, f2, f3, f4)
+    def set(f1: Float, f2: Float, f3: Float, f4: Float):              Unit = uniform.set(f1, f2, f3, f4)
     def setIdx(f1: Float, f2: Float, f3: Float, f4: Float, idx: Int): Unit = uniform.setIdx(f1, f2, f3, f4, idx)
   }
 
   class Mat2Syntax(val uniform: MirrorUniform) extends AnyVal with UniformSyntaxCommon {
-    def set(
-        m00: Float,
-        m01: Float,
-        m10: Float,
-        m11: Float
-    ): Unit = uniform.set(m00, m01, m10, m11)
+    def set(m00: Float, m01: Float, m10: Float, m11: Float): Unit = uniform.set(m00, m01, m10, m11)
 
     def set(matrix2f: Matrix2f): Unit = uniform.set(matrix2f)
 
-    def setIdx(
-        m00: Float,
-        m01: Float,
-        m10: Float,
-        m11: Float,
-        idx: Int
-    ): Unit = uniform.setIdx(m00, m01, m10, m11, idx)
+    def setIdx(m00: Float, m01: Float, m10: Float, m11: Float, idx: Int): Unit = uniform.setIdx(m00, m01, m10, m11, idx)
 
     def setIdx(matrix2f: Matrix2f, idx: Int): Unit = uniform.setIdx(matrix2f, idx)
   }

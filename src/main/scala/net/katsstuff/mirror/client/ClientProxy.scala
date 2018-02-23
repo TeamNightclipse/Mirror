@@ -36,7 +36,6 @@ class ClientProxy extends CommonProxy {
 
   override def bakeRenderModels(): Unit = MirrorRenderHelper.bakeModels()
 
-  override def registerRenderers(): Unit = {
+  override def registerRenderers(): Unit =
     MinecraftForge.EVENT_BUS.register(particleRenderer)
-  }
 }

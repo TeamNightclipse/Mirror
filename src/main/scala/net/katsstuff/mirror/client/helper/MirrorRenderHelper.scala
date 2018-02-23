@@ -157,7 +157,7 @@ object MirrorRenderHelper {
 
   def drawCubeRaw(): Unit = {
     val tes = Tessellator.getInstance()
-    val bb = tes.getBuffer
+    val bb  = tes.getBuffer
     bb.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
     //Front
     bb.pos(-0.5F, -0.5F, -0.5F).endVertex()

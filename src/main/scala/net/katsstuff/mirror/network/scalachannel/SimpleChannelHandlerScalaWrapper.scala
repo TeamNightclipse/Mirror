@@ -27,8 +27,9 @@ import net.katsstuff.mirror.helper.MirrorLogHelper
 import net.minecraftforge.fml.common.network.{FMLOutboundHandler, NetworkRegistry}
 import net.minecraftforge.fml.relauncher.Side
 
-class SimpleChannelHandlerScalaWrapper[A, Reply](handler: MessageHandler[A, Reply], side: Side)(implicit classTag: ClassTag[A])
-    extends SimpleChannelInboundHandler[A](classTag.runtimeClass.asInstanceOf[Class[_ <: A]]) {
+class SimpleChannelHandlerScalaWrapper[A, Reply](handler: MessageHandler[A, Reply], side: Side)(
+    implicit classTag: ClassTag[A]
+) extends SimpleChannelInboundHandler[A](classTag.runtimeClass.asInstanceOf[Class[_ <: A]]) {
 
   @throws[Exception]
   override protected def channelRead0(ctx: ChannelHandlerContext, msg: A): Unit = {

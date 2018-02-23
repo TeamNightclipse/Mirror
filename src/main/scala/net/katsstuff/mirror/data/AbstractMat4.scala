@@ -43,13 +43,16 @@ sealed trait AbstractMat4 { self =>
   def m32: Double
   def m33: Double
 
+  // format: OFF
   def create(
       m00: Double, m01: Double, m02: Double, m03: Double,
       m10: Double, m11: Double, m12: Double, m13: Double,
       m20: Double, m21: Double, m22: Double, m23: Double,
       m30: Double, m31: Double, m32: Double, m33: Double
   ): Self
+  // format: ON
 
+  // format: OFF
   def transpose: Self = create(
     m00 = m00, m01 = m10, m02 = m20, m03 = m30,
     m10 = m01, m11 = m11, m12 = m21, m13 = m31,
@@ -63,6 +66,8 @@ sealed trait AbstractMat4 { self =>
     m20 = m20 * scalar, m21 = m21 * scalar, m22 = m22 * scalar, m23 = m23 * scalar,
     m30 = m30 * scalar, m31 = m31 * scalar, m32 = m32 * scalar, m33 = m33 * scalar
   )
+  // format: ON
+
   def multiplyScalar(scalar: Double): Self = this * scalar
 
   def transformDirection(vec: AbstractVector3): vec.Self = {
@@ -70,11 +75,13 @@ sealed trait AbstractMat4 { self =>
     val y = vec.y
     val z = vec.z
 
+    // format: OFF
     vec.create(
       m00 * x + m10 * y + m20 * z,
       m01 * x + m11 * y + m21 * z,
       m02 * x + m12 * y + m22 * z
     )
+    // format: ON
   }
 }
 final case class MutableMat4(
@@ -87,6 +94,7 @@ final case class MutableMat4(
 
   override type Self = MutableMat4
 
+  // format: OFF
   override def create(
       m00: Double, m01: Double, m02: Double, m03: Double,
       m10: Double, m11: Double, m12: Double, m13: Double,
@@ -98,6 +106,7 @@ final case class MutableMat4(
     m20, m21, m22, m23,
     m30, m31, m32, m33
   )
+  // format: ON
 
   def *=(scalar: Double): Unit = {
     m00 *= scalar
@@ -124,12 +133,15 @@ final case class MutableMat4(
   override def multiplyScalar(scalar: Double): MutableMat4 = super.multiplyScalar(scalar)
   def copyObj:                                 MutableMat4 = copy()
 }
+
+// format: OFF
 final case class Mat4(
     m00: Double, m01: Double, m02: Double, m03: Double,
     m10: Double, m11: Double, m12: Double, m13: Double,
     m20: Double, m21: Double, m22: Double, m23: Double,
     m30: Double, m31: Double, m32: Double, m33: Double
 ) extends AbstractMat4 {
+  // format: ON
   override type Self = Mat4
 
   override def create(
@@ -148,7 +160,15 @@ final case class Mat4(
   override def multiplyScalar(scalar: Double): Mat4 = super.multiplyScalar(scalar)
 }
 object Mat4 {
-  val Identity = Mat4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
+
+  // format: ON
+  val Identity = Mat4(
+    1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 1, 0,
+    0, 0, 0, 1
+  )
+  // format: OFF
 
   //From libgdx https://github.com/libgdx/libgdx/blob/master/gdx/src/com/badlogic/gdx/math/Matrix4.java#L876
   def fromWorld(pos: AbstractVector3, forward: AbstractVector3, up: AbstractVector3): Mat4 = {
@@ -160,10 +180,12 @@ object Mat4 {
   }
 
   def fromAxes(xAxis: AbstractVector3, yAxis: AbstractVector3, zAxis: AbstractVector3, pos: AbstractVector3): Mat4 =
+    // format: OFF
     Mat4(
       xAxis.x, xAxis.y, xAxis.z, pos.x,
       yAxis.x, yAxis.y, yAxis.z, pos.y,
       zAxis.x, zAxis.y, zAxis.z, pos.z,
-      0, 0, 0, 1
+      0,       0,       0,       1
     )
+    // format: ON
 }

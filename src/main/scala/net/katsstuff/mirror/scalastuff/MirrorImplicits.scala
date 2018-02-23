@@ -21,7 +21,13 @@
 package net.katsstuff.mirror.scalastuff
 
 import java.util.Optional
-import java.util.function.{BooleanSupplier, Consumer => JConsumer, Function => JFunction, Predicate => JPredicate, Supplier => JSupplier}
+import java.util.function.{
+  BooleanSupplier,
+  Consumer => JConsumer,
+  Function => JFunction,
+  Predicate => JPredicate,
+  Supplier => JSupplier
+}
 
 import scala.collection.JavaConverters._
 import scala.reflect.ClassTag

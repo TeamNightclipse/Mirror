@@ -103,7 +103,8 @@ class ShaderManager(resourceManager: IResourceManager) extends IResourceManagerR
       init: MirrorShaderProgram => Unit
   ): Unit = {
     shaderProgramsInits.addBinding(shaderLocation, init)
-    val shader = shaderPrograms.getOrElseUpdate(shaderLocation, createShaderProgram(shaderLocation, shaderTypes, uniforms))
+    val shader =
+      shaderPrograms.getOrElseUpdate(shaderLocation, createShaderProgram(shaderLocation, shaderTypes, uniforms))
     init(shader)
   }
 

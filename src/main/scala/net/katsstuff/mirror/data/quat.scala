@@ -642,11 +642,13 @@ object Quat {
     fromAxes(xAxis.x, yAxis.x, zAxis.x, xAxis.y, yAxis.y, zAxis.y, xAxis.z, yAxis.z, zAxis.z)
 
   //https://github.com/libgdx/libgdx/blob/master/gdx/src/com/badlogic/gdx/math/Quaternion.java#L496
+  // format: OFF
   def fromAxes(
       xx: Double, xy: Double, xz: Double,
       yx: Double, yy: Double, yz: Double,
       zx: Double, zy: Double, zz: Double
   ): Quat = {
+    // format: ON
     val t = xx + yy + zz
 
     if (t >= 0) {
