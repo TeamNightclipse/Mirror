@@ -21,12 +21,14 @@
 package net.katsstuff.mirror.client.lib;
 
 import net.katsstuff.mirror.Mirror;
+import net.katsstuff.mirror.client.helper.ResourceHelperStatic;
+import net.katsstuff.mirror.client.helper.TextureLocation;
 import net.minecraft.util.ResourceLocation;
 
 public class LibParticleTexures {
 
-	public static final ResourceLocation PARTICLE_GLINT = Mirror.resource("entity/particle/particle_glint");
-	public static final ResourceLocation PARTICLE_GLOW = Mirror.resource("entity/particle/particle_glow");
-	public static final ResourceLocation PARTICLE_MOTE = Mirror.resource("entity/particle/particle_mote");
-	public static final ResourceLocation PARTICLE_STAR = Mirror.resource("entity/particle/particle_star");
+	public static final ResourceLocation PARTICLE_GLINT = ResourceHelperStatic.getAtlas(Mirror.Id(), TextureLocation.Particles(), "particle_glow");
+	public static final ResourceLocation PARTICLE_GLOW = ResourceHelperStatic.getAtlas(Mirror.Id(), TextureLocation.Particles(), "particle_glow");
+	public static final ResourceLocation PARTICLE_MOTE = ResourceHelperStatic.getAtlas(Mirror.Id(), TextureLocation.Particles(), "particle_mote");
+	public static final ResourceLocation PARTICLE_STAR = ResourceHelperStatic.getAtlas(Mirror.Id(), TextureLocation.Particles(), "particle_star");
 }
