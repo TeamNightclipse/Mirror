@@ -21,7 +21,8 @@
 package net.katsstuff.mirror
 
 import net.katsstuff.mirror.helper.MirrorLogHelper
-import net.katsstuff.mirror.network.MirrorPacketHandler
+import net.katsstuff.mirror.network.{MirrorPacketHandler, Vector3Serializer}
+import net.minecraft.network.datasync.DataSerializers
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fml.common.event.{FMLInitializationEvent, FMLPreInitializationEvent}
 import net.minecraftforge.fml.common.{Mod, SidedProxy}
@@ -46,6 +47,7 @@ object Mirror {
   def preInit(event: FMLPreInitializationEvent): Unit = {
     MirrorLogHelper.setLog(event.getModLog)
     MirrorPacketHandler.load()
+    DataSerializers.registerSerializer(Vector3Serializer)
     proxy.registerRenderers()
   }
 
