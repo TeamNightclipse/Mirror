@@ -22,12 +22,11 @@ package net.katsstuff.mirror.client.helper
 
 import org.lwjgl.opengl.{ARBBufferObject, GL15, GLContext}
 
+import net.minecraft.client.renderer.OpenGlHelper
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 @SideOnly(Side.CLIENT)
 object MirrorOpenGLHelper {
-
-  import net.minecraft.client.renderer.OpenGlHelper._
 
   private val contextcapabilities = GLContext.getCapabilities
   private val arbVbo              = !contextcapabilities.OpenGL15 && contextcapabilities.GL_ARB_vertex_buffer_object
@@ -43,5 +42,5 @@ object MirrorOpenGLHelper {
   val GL_DYNAMIC_COPY: Int = assignVboValue(GL15.GL_DYNAMIC_COPY, ARBBufferObject.GL_DYNAMIC_COPY_ARB)
 
   private def assignVboValue(glValue: Int, arbValue: Int): Int =
-    if (vboSupported) if (arbVbo) arbValue else glValue else 0
+    if (OpenGlHelper.vboSupported) if (arbVbo) arbValue else glValue else 0
 }

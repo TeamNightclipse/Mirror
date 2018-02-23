@@ -24,9 +24,11 @@ import org.lwjgl.opengl.GL11
 import org.lwjgl.util.glu.{Cylinder, Disk, Sphere}
 
 import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
-import net.minecraft.client.renderer.{GLAllocation, GlStateManager, OpenGlHelper, Tessellator}
+import net.minecraft.client.renderer.{GLAllocation, GlStateManager, OpenGlHelper, RenderHelper, Tessellator}
 import net.minecraft.client.resources.{IResourceManagerReloadListener, SimpleReloadableResourceManager}
+import net.minecraft.item.{ItemBlock, ItemStack}
 import net.minecraft.util.math.MathHelper
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
@@ -34,28 +36,27 @@ import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 @SideOnly(Side.CLIENT)
 object MirrorRenderHelper {
 
-  private var sphereHighId   = 0
-  private var sphereMidId    = 0
-  private var sphereLowId    = 0
+  private var sphereHighId = 0
+  private var sphereMidId  = 0
+  private var sphereLowId  = 0
 
   private var cylinderHighId = 0
   private var cylinderMidId  = 0
   private var cylinderLowId  = 0
 
-  private var coneHighId     = 0
-  private var coneMidId      = 0
-  private var coneLowId      = 0
+  private var coneHighId = 0
+  private var coneMidId  = 0
+  private var coneLowId  = 0
 
-  private var diskHighId     = 0
-  private var diskMidId      = 0
-  private var diskLowId      = 0
+  private var diskHighId = 0
+  private var diskMidId  = 0
+  private var diskLowId  = 0
+
+  private var cubeId = 0
 
   private val useVBO = OpenGlHelper.useVbo()
 
   def bakeModels(): Unit = {
-    val tes = Tessellator.getInstance()
-    val vb  = tes.getBuffer
-
     val sphere   = new Sphere
     val cylinder = new Cylinder
     val cone     = new Cylinder
@@ -112,6 +113,8 @@ object MirrorRenderHelper {
     diskHighId = createList(disk.draw(1F, 0F, 32, 1))
     diskMidId = createList(disk.draw(1F, 0F, 16, 1))
     diskLowId = createList(disk.draw(1F, 0F, 8, 1))
+
+    cubeId = createList(drawCubeRaw())
   }
 
   def createList(create: => Unit): Int = {
@@ -148,6 +151,47 @@ object MirrorRenderHelper {
 
   def drawDisk(color: Int, alpha: Float, dist: Double): Unit =
     drawObj(color, alpha, dist, diskHighId, diskMidId, diskLowId)
+
+  def drawCube(color: Int, alpha: Float): Unit =
+    drawObj(color, alpha, 0F, cubeId, cubeId, cubeId)
+
+  def drawCubeRaw(): Unit = {
+    val tes = Tessellator.getInstance()
+    val bb = tes.getBuffer
+    bb.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
+    //Front
+    bb.pos(-0.5F, -0.5F, -0.5F).endVertex()
+    bb.pos(0.5F, -0.5F, -0.5F).endVertex()
+    bb.pos(0.5F, 0.5F, -0.5F).endVertex()
+    bb.pos(-0.5F, 0.5F, -0.5F).endVertex()
+    //Back
+    bb.pos(0.5F, -0.5F, 0.5F).endVertex()
+    bb.pos(-0.5F, -0.5F, 0.5F).endVertex()
+    bb.pos(-0.5F, 0.5F, 0.5F).endVertex()
+    bb.pos(0.5F, 0.5F, 0.5F).endVertex()
+    //Right
+    bb.pos(0.5F, -0.5F, -0.5F).endVertex()
+    bb.pos(0.5F, -0.5F, 0.5F).endVertex()
+    bb.pos(0.5F, 0.5F, 0.5F).endVertex()
+    bb.pos(0.5F, 0.5F, -0.5F).endVertex()
+    //Left
+    bb.pos(-0.5F, -0.5F, 0.5F).endVertex()
+    bb.pos(-0.5F, -0.5F, -0.5F).endVertex()
+    bb.pos(-0.5F, 0.5F, -0.5F).endVertex()
+    bb.pos(-0.5F, 0.5F, 0.5F).endVertex()
+    //Top
+    bb.pos(-0.5F, 0.5F, -0.5F).endVertex()
+    bb.pos(0.5F, 0.5F, -0.5F).endVertex()
+    bb.pos(0.5F, 0.5F, 0.5F).endVertex()
+    bb.pos(-0.5F, 0.5F, 0.5F).endVertex()
+    //Bottom
+    bb.pos(-0.5F, -0.5F, 0.5F).endVertex()
+    bb.pos(0.5F, -0.5F, 0.5F).endVertex()
+    bb.pos(0.5F, -0.5F, -0.5F).endVertex()
+    bb.pos(-0.5F, -0.5F, -0.5F).endVertex()
+
+    tes.draw()
+  }
 
   def renderDropOffSphere(
       radius: Float,
@@ -213,5 +257,21 @@ object MirrorRenderHelper {
       case resourceManager: SimpleReloadableResourceManager => resourceManager.registerReloadListener(listener)
       case _                                                => listener.onResourceManagerReload(Minecraft.getMinecraft.getResourceManager)
     }
+  }
+
+  def renderItemStack(stack: ItemStack): Unit = {
+    val isBlock = stack.getItem.isInstanceOf[ItemBlock]
+
+    //Fix stack 'y' center
+    if (isBlock) GlStateManager.translate(0F, -0.1F, 0F)
+
+    val render = Minecraft.getMinecraft.getRenderItem
+    GlStateManager.pushAttrib()
+    RenderHelper.enableStandardItemLighting()
+    render.renderItem(stack, ItemCameraTransforms.TransformType.GROUND)
+    RenderHelper.disableStandardItemLighting()
+    GlStateManager.popAttrib()
+
+    if (isBlock) GlStateManager.translate(0F, 0.1F, 0F)
   }
 }

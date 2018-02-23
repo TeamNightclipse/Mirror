@@ -36,8 +36,8 @@ class ParticleGlow(
     scale: Float,
     lifetime: Int,
     val tpe: GlowTexture
-) extends AbstractParticleGlow(_world, pos, Vector3.Zero)
-    with IGlowParticle {
+) extends AbstractMirrorParticle(_world, pos, Vector3.Zero)
+    with IMirrorParticle {
 
   private val initScale = scale
 

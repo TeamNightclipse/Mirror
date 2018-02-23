@@ -22,16 +22,15 @@ package net.katsstuff.mirror.client.shaders
 
 import java.io.IOException
 
+import scala.collection.JavaConverters._
+
 import org.apache.commons.io.IOUtils
 import org.apache.commons.lang3.StringUtils
 import org.lwjgl.BufferUtils
 
-import net.katsstuff.mirror.helper.MirrorLogHelper
 import net.minecraft.client.renderer.OpenGlHelper
 import net.minecraft.client.resources.{IResource, IResourceManager}
 import net.minecraft.util.ResourceLocation
-
-import scala.collection.JavaConverters._
 
 case class MirrorShader(id: Int, shaderType: ShaderType) {
   private var deleted: Boolean = false

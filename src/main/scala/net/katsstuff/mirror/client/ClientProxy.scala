@@ -22,9 +22,14 @@ package net.katsstuff.mirror.client
 
 import net.katsstuff.mirror.CommonProxy
 import net.katsstuff.mirror.client.helper.MirrorRenderHelper
-import net.katsstuff.mirror.client.particles.{IGlowParticle, ParticleRenderer}
+import net.katsstuff.mirror.client.particles.ParticleRenderer
 import net.minecraftforge.common.MinecraftForge
+import net.minecraftforge.fml.client.FMLClientHandler
 
+object ClientProxy {
+
+  lazy val isOptifineInstalled: Boolean = FMLClientHandler.instance.hasOptifine
+}
 class ClientProxy extends CommonProxy {
 
   val particleRenderer = new ParticleRenderer

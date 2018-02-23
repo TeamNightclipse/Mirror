@@ -28,7 +28,8 @@ import scala.beans.BeanProperty
 
 import net.katsstuff.mirror.scalastuff.MirrorImplicits._
 import net.minecraft.entity.{Entity, EntityLivingBase}
-import net.minecraft.util.math.{BlockPos, MathHelper, Vec3d}
+import net.minecraft.util.EnumFacing
+import net.minecraft.util.math.{BlockPos, MathHelper, Vec3d, Vec3i}
 
 sealed trait AbstractVector3 extends Any { self =>
 
@@ -224,6 +225,11 @@ sealed trait AbstractVector3 extends Any { self =>
 		* Rotate this vector around the given point.
 		*/
   def rotate(angle: Double, axis: AbstractVector3): Self = rotate(Quat.fromAxisAngle(axis, angle))
+
+  /**
+    * Rotate this vector around the given axis.
+    */
+  def rotate(angle: Double, axis: EnumFacing.Axis): Self = rotate(Quat.fromAxisAngle(axis, angle))
 
   /**
 		* Rotate this vector around the given point.
@@ -442,6 +448,13 @@ final case class MutableVector3(@BeanProperty var x: Double, @BeanProperty var y
     this
   }
 
+  def rotateMutable(quat: MutableQuat, destroyQuat: Boolean = false): MutableVector3 =
+    quat.rotateMutable(this, destroyQuat)
+  def rotateMutable(angle: Double, axis: EnumFacing.Axis): MutableVector3 =
+    rotateMutable(MutableQuat.fromAxisAngle(axis, angle), destroyQuat = true)
+  def rotateMutable(angle: Double, axis: AbstractVector3): MutableVector3 =
+    rotateMutable(MutableQuat.fromAxisAngle(axis, angle), destroyQuat = true)
+
   override def asMutable: MutableVector3 = this
 
   override def asImmutable: Vector3 = Vector3(x, y, z)
@@ -475,6 +488,7 @@ final case class MutableVector3(@BeanProperty var x: Double, @BeanProperty var y
   override def offset(direction: AbstractVector3, distance: Double): MutableVector3 = super.offset(direction, distance)
 
   override def rotate(quat: Quat):                              MutableVector3 = super.rotate(quat)
+  override def rotate(angle: Double, axis: EnumFacing.Axis):    MutableVector3 = super.rotate(angle, axis)
   override def rotate(angle: Double, axis: AbstractVector3):    MutableVector3 = super.rotate(angle, axis)
   override def rotateRad(angle: Double, axis: AbstractVector3): MutableVector3 = super.rotateRad(angle, axis)
   override def lerp(target: AbstractVector3, alpha: Double):    MutableVector3 = super.lerp(target, alpha)
@@ -540,6 +554,7 @@ final case class Vector3(@BeanProperty x: Double, @BeanProperty y: Double, @Bean
   override def offset(direction: AbstractVector3, distance: Double): Vector3 = super.offset(direction, distance)
 
   override def rotate(quat: Quat):                              Vector3 = super.rotate(quat)
+  override def rotate(angle: Double, axis: EnumFacing.Axis):    Vector3 = super.rotate(angle, axis)
   override def rotate(angle: Double, axis: AbstractVector3):    Vector3 = super.rotate(angle, axis)
   override def rotateRad(angle: Double, axis: AbstractVector3): Vector3 = super.rotateRad(angle, axis)
 
@@ -679,8 +694,53 @@ object Vector3 {
     override def offset(direction: AbstractVector3, distance: Double): WrappedVec3d = super.offset(direction, distance)
 
     override def rotate(quat: Quat):                              WrappedVec3d = super.rotate(quat)
+    override def rotate(angle: Double, axis: EnumFacing.Axis):    WrappedVec3d = super.rotate(angle, axis)
     override def rotate(angle: Double, axis: AbstractVector3):    WrappedVec3d = super.rotate(angle, axis)
     override def rotateRad(angle: Double, axis: AbstractVector3): WrappedVec3d = super.rotateRad(angle, axis)
+  }
+
+  //Should I keep this as a AnyVal? Almost all uses requires instantiation
+  implicit class WrappedVec3i(val toVec3i: Vec3i) extends AnyVal with AbstractVector3 {
+
+    override type Self = WrappedVec3i
+    override def x: Double = toVec3i.x
+    override def y: Double = toVec3i.y
+    override def z: Double = toVec3i.z
+
+    override def create(x: Double, y: Double, z: Double): WrappedVec3i   = new Vec3i(x, y, z)
+    override def asMutable:                               MutableVector3 = MutableVector3(x, y, z)
+    override def asImmutable:                             Vector3        = Vector3(x, y, z)
+
+    //These methods beyond this only call super, but don't have dependent type so they are java friendly
+
+    override def add(other: AbstractVector3):          WrappedVec3i = super.add(other)
+    override def add(other: Double):                   WrappedVec3i = super.add(other)
+    override def add(x: Double, y: Double, z: Double): WrappedVec3i = super.add(x, y, z)
+
+    override def subtract(other: AbstractVector3):          WrappedVec3i = super.subtract(other)
+    override def subtract(other: Double):                   WrappedVec3i = super.subtract(other)
+    override def subtract(x: Double, y: Double, z: Double): WrappedVec3i = super.subtract(x, y, z)
+
+    override def multiply(other: AbstractVector3):          WrappedVec3i = super.multiply(other)
+    override def multiply(other: Double):                   WrappedVec3i = super.multiply(other)
+    override def multiply(x: Double, y: Double, z: Double): WrappedVec3i = super.multiply(x, y, z)
+
+    override def divide(other: AbstractVector3):          WrappedVec3i = super.divide(other)
+    override def divide(other: Double):                   WrappedVec3i = super.divide(other)
+    override def divide(x: Double, y: Double, z: Double): WrappedVec3i = super.divide(x, y, z)
+
+    override def negate:    WrappedVec3i = unary_-
+    override def normalize: WrappedVec3i = super.normalize
+
+    override def cross(other: AbstractVector3):          WrappedVec3i = super.cross(other)
+    override def cross(x: Double, y: Double, z: Double): WrappedVec3i = super.cross(x, y, z)
+
+    override def offset(direction: AbstractVector3, distance: Double): WrappedVec3i = super.offset(direction, distance)
+
+    override def rotate(quat: Quat):                              WrappedVec3i = super.rotate(quat)
+    override def rotate(angle: Double, axis: EnumFacing.Axis):    WrappedVec3i = super.rotate(angle, axis)
+    override def rotate(angle: Double, axis: AbstractVector3):    WrappedVec3i = super.rotate(angle, axis)
+    override def rotateRad(angle: Double, axis: AbstractVector3): WrappedVec3i = super.rotateRad(angle, axis)
   }
 
   implicit class DoubleOps(private val double: Double) extends AnyVal {

@@ -24,7 +24,7 @@ import scala.collection.mutable.ArrayBuffer
 
 import org.lwjgl.opengl.GL11
 
-import net.katsstuff.mirror.client.helper.BlendHelper
+import net.katsstuff.mirror.client.helper.Blending
 import net.katsstuff.mirror.client.lib.LibParticleTexures
 import net.minecraft.client.Minecraft
 import net.minecraft.client.particle.Particle
@@ -39,7 +39,7 @@ import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 @SideOnly(Side.CLIENT)
 class ParticleRenderer {
 
-  private val particles = ArrayBuffer.empty[IGlowParticle]
+  private val particles = ArrayBuffer.empty[IMirrorParticle]
 
   @SubscribeEvent
   def onTextureStitch(event: TextureStitchEvent): Unit = {
@@ -96,14 +96,14 @@ class ParticleRenderer {
       val tess   = Tessellator.getInstance
       val buffer = tess.getBuffer
 
-      BlendHelper.Normal.blend()
+      Blending.Normal()
       buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP)
       for (particle <- particles if particle.shouldRender && !particle.isAdditive) {
         particle.renderParticleGlow(buffer, player, partialTicks, x, xz, z, yz, xy)
       }
       tess.draw()
 
-      BlendHelper.AdditiveAlpha.blend()
+      Blending.AdditiveAlpha()
       buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP)
       for (particle <- particles if particle.shouldRender && particle.isAdditive) {
         particle.renderParticleGlow(buffer, player, partialTicks, x, xz, z, yz, xy)
@@ -111,14 +111,14 @@ class ParticleRenderer {
       tess.draw()
 
       GlStateManager.disableDepth()
-      BlendHelper.Normal.blend()
+      Blending.Normal()
       buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP)
       for (particle <- particles if particle.shouldRender && particle.ignoreDepth && !particle.isAdditive) {
         particle.renderParticleGlow(buffer, player, partialTicks, x, xz, z, yz, xy)
       }
       tess.draw()
 
-      BlendHelper.AdditiveAlpha.blend()
+      Blending.AdditiveAlpha()
       buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP)
       for (particle <- particles if particle.shouldRender && particle.ignoreDepth && particle.isAdditive) {
         particle.renderParticleGlow(buffer, player, partialTicks, x, xz, z, yz, xy)
@@ -134,7 +134,7 @@ class ParticleRenderer {
     }
   }
 
-  def addParticle(particle: IGlowParticle): Unit = {
+  def addParticle(particle: IMirrorParticle): Unit = {
     require(particle != null, "Null particle")
     particles += particle
   }

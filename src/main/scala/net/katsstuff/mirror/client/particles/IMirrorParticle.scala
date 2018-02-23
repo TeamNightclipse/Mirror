@@ -20,19 +20,13 @@
  */
 package net.katsstuff.mirror.client.particles
 
-import net.katsstuff.mirror.data.Vector3
-import net.minecraft.client.particle.Particle
 import net.minecraft.client.renderer.BufferBuilder
 import net.minecraft.entity.Entity
-import net.minecraft.world.World
 
-abstract class AbstractParticleGlow(worldIn: World, pos: Vector3, speed: Vector3)
-    extends Particle(worldIn, pos.x, pos.y, pos.z, speed.x, speed.y, speed.z)
-    with IGlowParticle {
-
-  override def onUpdateGlow(): Unit = super.onUpdate()
-
-  override def renderParticleGlow(
+trait IMirrorParticle {
+  //These methods need to delegate to the respective minecraft methods
+  def onUpdateGlow(): Unit
+  def renderParticleGlow(
       buffer: BufferBuilder,
       entityIn: Entity,
       partialTicks: Float,
@@ -41,6 +35,11 @@ abstract class AbstractParticleGlow(worldIn: World, pos: Vector3, speed: Vector3
       rotationYZ: Float,
       rotationXY: Float,
       rotationXZ: Float
-  ): Unit =
-    super.renderParticle(buffer, entityIn, partialTicks, rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ)
+  ): Unit
+
+  def shouldRender: Boolean = true
+
+  def isAdditive:  Boolean
+  def ignoreDepth: Boolean
+  def alive:       Boolean
 }

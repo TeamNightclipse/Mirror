@@ -20,15 +20,20 @@
  */
 package net.katsstuff.mirror.client.helper
 
+import java.util
+
 import javax.annotation.Nullable
 
+import com.google.common.collect.ImmutableMap
+
 import net.minecraft.client.renderer.block.model.{ModelResourceLocation => MRL}
-import net.minecraft.util.ResourceLocation
+import net.minecraft.util.{IStringSerializable, ResourceLocation}
 
 trait Location {
   def rawPath: String
   def path: String = s"$rawPath/"
 }
+case class MiscLocation(rawPath: String) extends Location
 
 case class ModelLocation(rawPath: String) extends Location
 object ModelLocation {
@@ -53,6 +58,12 @@ object AssetLocation {
   val Shaders  = AssetLocation("shaders")
   val Sounds   = AssetLocation("sounds")
   val Textures = AssetLocation("textures")
+}
+
+case class ShaderLocation(rawPath: String) extends Location
+case object ShaderLocation {
+  val Post    = ShaderLocation("post")
+  val Program = ShaderLocation("program")
 }
 
 trait ResourceHelperJ {
@@ -81,6 +92,27 @@ trait ResourceHelperJ {
 
   def getTexture(modId: String, @Nullable location: Location, name: String): ResourceLocation =
     getLocation(modId, AssetLocation.Textures, location, name, ".png")
+
+  def getSimple(modId: String, name: String): ResourceLocation = getLocation(modId, null, null, name, "")
+
+  def from(
+      amount: Int,
+      name: String,
+      function: util.function.Function[String, ResourceLocation]
+  ): Array[ResourceLocation] = Array.tabulate[ResourceLocation](amount)(i => function(s"$name$i"))
+
+  def from[T <: Enum[T] with IStringSerializable](
+      clazz: Class[T],
+      name: String,
+      function: util.function.Function[String, ResourceLocation]
+  ): ImmutableMap[T, ResourceLocation] = {
+    val builder = ImmutableMap.builder[T, ResourceLocation]
+    val enums   = clazz.getEnumConstants
+
+    enums.foreach(enum => builder.put(enum, function.apply(s"$name${enum.getName}")))
+
+    builder.build()
+  }
 }
 object ResourceHelperJ extends ResourceHelperJ
 
@@ -110,5 +142,17 @@ trait ResourceHelperS {
 
   def getTexture(modId: String, location: Option[Location], name: String): ResourceLocation =
     getLocation(modId, Some(AssetLocation.Textures), location, name, ".png")
+
+  def getSimple(modId: String, name: String): ResourceLocation = getLocation(modId, None, None, name, "")
+
+  def from(amount: Int, name: String, f: String => ResourceLocation): Seq[ResourceLocation] =
+    Seq.tabulate[ResourceLocation](amount)(i => f(s"$name$i"))
+
+  def from[T <: Enum[T] with IStringSerializable](
+      clazz: Class[T],
+      name: String,
+      f: String => ResourceLocation
+  ): Map[T, ResourceLocation] =
+    clazz.getEnumConstants.map(enum => enum -> f(s"$name${enum.getName}")).toMap
 }
 object ResourceHelperS extends ResourceHelperS

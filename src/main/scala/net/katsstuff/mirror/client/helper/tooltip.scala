@@ -23,14 +23,13 @@ package net.katsstuff.mirror.client.helper
 import java.util
 import java.util.function.BooleanSupplier
 
-import net.minecraft.client.resources.I18n
-import net.minecraft.util.text.TextFormatting
 import scala.collection.JavaConverters._
 import scala.language.implicitConversions
 
-import net.minecraft.client.gui.GuiScreen
-
 import net.katsstuff.mirror.scalastuff.MirrorImplicits._
+import net.minecraft.client.gui.GuiScreen
+import net.minecraft.client.resources.I18n
+import net.minecraft.util.text.TextFormatting
 
 case class Tooltip(objs: Seq[String], lines: Seq[String]) {
 
@@ -64,7 +63,7 @@ sealed trait KeyCondition {
   def condition:            Boolean
   def or(tooltip: Tooltip): Tooltip
 
-  def apply(tooltip: Tooltip): Condition = Condition(() => condition, tooltip).orElse(or)
+  def apply(tooltip: Tooltip): Condition = Condition(() => condition, tooltip).orElse(or _)
 }
 object KeyCondition {
   case object Nothing extends KeyCondition {

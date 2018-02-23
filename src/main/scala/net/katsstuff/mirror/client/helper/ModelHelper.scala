@@ -21,9 +21,9 @@
 package net.katsstuff.mirror.client.helper
 
 import net.minecraft.block.Block
-import net.minecraft.item.Item
 import net.minecraft.client.renderer.block.model.{ModelResourceLocation => MRL}
 import net.minecraft.init.Items
+import net.minecraft.item.Item
 import net.minecraft.util.IStringSerializable
 import net.minecraftforge.client.model.ModelLoader
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}

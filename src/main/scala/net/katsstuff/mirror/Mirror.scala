@@ -21,6 +21,7 @@
 package net.katsstuff.mirror
 
 import net.katsstuff.mirror.helper.MirrorLogHelper
+import net.katsstuff.mirror.network.MirrorPacketHandler
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fml.common.event.{FMLInitializationEvent, FMLPreInitializationEvent}
 import net.minecraftforge.fml.common.{Mod, SidedProxy}
@@ -44,6 +45,7 @@ object Mirror {
   @Mod.EventHandler
   def preInit(event: FMLPreInitializationEvent): Unit = {
     MirrorLogHelper.setLog(event.getModLog)
+    MirrorPacketHandler.load()
     proxy.registerRenderers()
   }
 

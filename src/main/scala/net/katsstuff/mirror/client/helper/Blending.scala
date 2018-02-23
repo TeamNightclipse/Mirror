@@ -20,19 +20,16 @@
  */
 package net.katsstuff.mirror.client.helper
 
+import net.minecraft.client.renderer.GlStateManager.{DestFactor, SourceFactor}
 import net.minecraft.client.renderer.{GlStateManager, OpenGlHelper}
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 @SideOnly(Side.CLIENT)
 case class Blending(source: GlStateManager.SourceFactor, dest: GlStateManager.DestFactor) {
-  def blend(): Unit = GlStateManager.blendFunc(source, dest)
+  def apply(): Unit = GlStateManager.blendFunc(source, dest)
 }
-
 @SideOnly(Side.CLIENT)
-object BlendHelper {
-  import GlStateManager.SourceFactor
-  import GlStateManager.DestFactor
-
+object Blending {
   val Normal        = Blending(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA)
   val Alpha         = Blending(SourceFactor.ONE, DestFactor.SRC_ALPHA)
   val PreAlpha      = Blending(SourceFactor.ONE, DestFactor.ONE_MINUS_SRC_ALPHA)

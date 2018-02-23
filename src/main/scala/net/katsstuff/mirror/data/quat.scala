@@ -27,6 +27,7 @@ import scala.beans.BeanProperty
 import org.lwjgl.util.vector.{Matrix4f, Quaternion}
 
 import net.minecraft.entity.Entity
+import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.MathHelper
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
@@ -179,6 +180,7 @@ abstract sealed class AbstractQuat { self =>
     val multiplied = this * pure * this.conjugate
     vec3.create(multiplied.x, multiplied.y, multiplied.z)
   }
+
   def *(vec3: AbstractVector3): vec3.Self = rotate(vec3)
 
   def conjugate: Self = create(-x, -y, -z, w)
@@ -377,6 +379,18 @@ final case class MutableQuat(
     set(newX, newY, newZ, newW)
   }
 
+  def rotateMutable(vec3: MutableVector3, destroyThis: Boolean = false): MutableVector3 = {
+    val pure = Quat(vec3.x, vec3.y, vec3.z, 0)
+    val multiplied = if (destroyThis) {
+      this *= pure *= conjugate
+    } else {
+      this * pure * this.conjugate
+    }
+    vec3.set(multiplied.x, multiplied.y, multiplied.z)
+  }
+
+  def *=(vec3: MutableVector3): MutableVector3 = rotate(vec3)
+
   def conjugateMutable(): this.type = {
     x = -x
     y = -y
@@ -413,6 +427,121 @@ final case class MutableQuat(
 
   override def mulLeft(other: AbstractQuat):                        MutableQuat = super.mulLeft(other)
   override def mulLeft(x: Double, y: Double, z: Double, w: Double): MutableQuat = super.mulLeft(x, y, z, w)
+}
+object MutableQuat {
+
+  /**
+    * Creates a quat from a rotation vec and an angle.
+    *
+    * @param vec3 The rotation vec.
+    * @param angle The rotation angle. This needs to be in radians.
+    */
+  def fromAxisAngleRad(vec3: AbstractVector3, angle: Double): MutableQuat = {
+    val halfAngle    = (angle * 0.5).toFloat
+    val sinHalfAngle = MathHelper.sin(halfAngle)
+    MutableQuat(vec3.x * sinHalfAngle, vec3.y * sinHalfAngle, vec3.z * sinHalfAngle, MathHelper.cos(halfAngle))
+  }
+
+  def fromAxisAngle(vec3: AbstractVector3, angle: Double): MutableQuat = fromAxisAngleRad(vec3, Math.toRadians(angle))
+
+  def fromAxisAngle(axis: EnumFacing.Axis, angle: Double): MutableQuat = {
+    import EnumFacing.Axis._
+    val vec = axis match {
+      case X => Vector3.Forward
+      case Y => Vector3.Up
+      case Z => Vector3.Right
+    }
+
+    fromAxisAngleRad(vec, Math.toRadians(angle))
+  }
+
+  def fromEuler(yaw: Float, pitch: Float, roll: Float): MutableQuat = {
+    val clampedPitch = if (pitch > 90F || pitch < -90F) Math.IEEEremainder(pitch, 180F) else pitch
+    val clampedYaw   = if (yaw > 180F || yaw < -180F) Math.IEEEremainder(yaw, 360F) else yaw
+    val clampedRoll  = if (roll > 180F || roll < -180F) Math.IEEEremainder(roll, 360F) else roll
+
+    fromEulerRad(
+      Math.toRadians(clampedYaw).toFloat,
+      Math.toRadians(clampedPitch).toFloat,
+      Math.toRadians(clampedRoll).toFloat
+    )
+  }
+
+  def fromEulerRad(yaw: Float, pitch: Float, roll: Float): MutableQuat = {
+    val cy = MathHelper.cos(yaw / 2)
+    val cp = MathHelper.cos(pitch / 2)
+    val cr = MathHelper.cos(roll / 2)
+
+    val sy = -MathHelper.sin(yaw / 2)
+    val sp = MathHelper.sin(pitch / 2)
+    val sr = MathHelper.sin(roll / 2)
+
+    val w = cy * cr * cp - sy * sr * sp
+    val x = sy * sr * cp + cy * cr * sp
+    val y = sy * cr * cp + cy * sr * sp
+    val z = cy * sr * cp - sy * cr * sp
+
+    MutableQuat(x, y, z, w)
+  }
+
+  def orientationOf(entity: Entity): MutableQuat = fromEuler(entity.rotationYaw, entity.rotationPitch, 0F)
+
+  def lookRotation(forward: AbstractVector3, up: AbstractVector3): MutableQuat = {
+    val vect3 = forward.normalize
+    val vect1 = up.cross(forward).normalize
+    val vect2 = forward.cross(vect1)
+    fromAxes(vect1, vect2, vect3)
+  }
+
+  def fromAxes(xAxis: AbstractVector3, yAxis: AbstractVector3, zAxis: AbstractVector3): MutableQuat =
+    fromAxes(xAxis.x, yAxis.x, zAxis.x, xAxis.y, yAxis.y, zAxis.y, xAxis.z, yAxis.z, zAxis.z)
+
+  //https://github.com/libgdx/libgdx/blob/master/gdx/src/com/badlogic/gdx/math/Quaternion.java#L496
+  def fromAxes(
+      xx: Double, xy: Double, xz: Double,
+      yx: Double, yy: Double, yz: Double,
+      zx: Double, zy: Double, zz: Double
+  ): MutableQuat = {
+    val t = xx + yy + zz
+
+    if (t >= 0) {
+      val squared = Math.sqrt(t + 1)
+      val w       = 0.5f * squared
+      val s       = 0.5f / squared
+
+      val x = (zy - yz) * s
+      val y = (xz - zx) * s
+      val z = (yx - xy) * s
+      MutableQuat(x, y, z, w)
+    } else if ((xx > yy) && (xx > zz)) {
+      val squared = Math.sqrt(1.0 + xx - yy - zz)
+      val x       = squared * 0.5f
+
+      val s = 0.5f / squared
+      val y = (yx + xy) * s
+      val z = (xz + zx) * s
+      val w = (zy - yz) * s
+      MutableQuat(x, y, z, w)
+    } else if (yy > zz) {
+      val squared = Math.sqrt(1.0 + yy - xx - zz)
+      val y       = squared * 0.5f
+
+      val s = 0.5f / squared
+      val x = (yx + xy) * s
+      val z = (zy + yz) * s
+      val w = (xz - zx) * s
+      MutableQuat(x, y, z, w)
+    } else {
+      val squared = Math.sqrt(1.0 + zz - xx - yy)
+      val z       = squared * 0.5f
+
+      val s = 0.5f / squared
+      val x = (xz + zx) * s
+      val y = (zy + yz) * s
+      val w = (yx - xy) * s
+      MutableQuat(x, y, z, w)
+    }
+  }
 }
 
 final case class Quat(
@@ -460,6 +589,16 @@ object Quat {
   }
 
   def fromAxisAngle(vec3: AbstractVector3, angle: Double): Quat = fromAxisAngleRad(vec3, Math.toRadians(angle))
+
+  def fromAxisAngle(axis: EnumFacing.Axis, angle: Double): Quat = {
+    import EnumFacing.Axis._
+    val vec = axis match {
+      case X => Vector3.Forward
+      case Y => Vector3.Up
+      case Z => Vector3.Right
+    }
+    fromAxisAngleRad(vec, Math.toRadians(angle))
+  }
 
   def fromEuler(yaw: Float, pitch: Float, roll: Float): Quat = {
     val clampedPitch = if (pitch > 90F || pitch < -90F) Math.IEEEremainder(pitch, 180F) else pitch
