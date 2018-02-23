@@ -44,12 +44,13 @@ object ModelLocation {
 
 case class TextureLocation(rawPath: String) extends Location
 object TextureLocation {
-  val Blocks = TextureLocation("blocks")
-  val Items  = TextureLocation("items")
-  val Effect = TextureLocation("effect")
-  val Entity = TextureLocation("effect")
-  val Gui    = TextureLocation("gui")
-  val Model  = TextureLocation("model")
+  val Blocks    = TextureLocation("blocks")
+  val Items     = TextureLocation("items")
+  val Effect    = TextureLocation("effect")
+  val Particles = TextureLocation("particles")
+  val Entity    = TextureLocation("effect")
+  val Gui       = TextureLocation("gui")
+  val Model     = TextureLocation("model")
 }
 
 case class AssetLocation(rawPath: String) extends Location
@@ -114,7 +115,7 @@ trait ResourceHelperJ {
     builder.build()
   }
 }
-object ResourceHelperJ extends ResourceHelperJ
+object ResourceHelperStatic extends ResourceHelperJ
 
 trait ResourceHelperS {
 
