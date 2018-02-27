@@ -8,6 +8,13 @@ import org.gradle.jvm.tasks.Jar
 import java.util.Properties
 
 buildscript {
+    repositories {
+        jcenter()
+        maven {
+            name = "forge"
+            setUrl("http://files.minecraftforge.net/maven")
+        }
+    }
     dependencies {
         classpath("net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT")
     }
