@@ -275,7 +275,7 @@ class MirrorUniform(
 }
 object MirrorUniform {
 
-  def create(location: Int, tpe: UniformType, count: Int): MirrorUniform =
+  private[mirror] def create(location: Int, tpe: UniformType, count: Int): MirrorUniform =
     if (tpe.floatBuffer)
       new MirrorUniform(location, tpe, count, null, BufferUtils.createFloatBuffer(count * tpe.bufferSize))
     else new MirrorUniform(location, tpe, count, BufferUtils.createIntBuffer(count * tpe.bufferSize), null)

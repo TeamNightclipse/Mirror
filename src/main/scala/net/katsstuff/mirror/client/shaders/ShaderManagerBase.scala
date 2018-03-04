@@ -21,8 +21,11 @@
 package net.katsstuff.mirror.client.shaders
 
 import java.io.IOException
+import java.util
+import java.util.function.Consumer
 
 import scala.collection.mutable
+import scala.collection.JavaConverters._
 import scala.util.control.NonFatal
 
 import net.katsstuff.mirror.client.helper.MirrorRenderHelper
@@ -35,7 +38,7 @@ import net.minecraftforge.fml.common.ProgressManager
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 @SideOnly(Side.CLIENT)
-class ShaderManager(resourceManager: IResourceManager) extends IResourceManagerReloadListener {
+class ShaderManagerBase(resourceManager: IResourceManager) extends IResourceManagerReloadListener {
   private val shaderPrograms = mutable.Map.empty[ResourceLocation, MirrorShaderProgram]
   private val shaderProgramsInits = {
     type ShaderInit = MirrorShaderProgram => Unit
@@ -49,7 +52,7 @@ class ShaderManager(resourceManager: IResourceManager) extends IResourceManagerR
 
   def compileShader(location: ResourceLocation, shaderType: ShaderType): MirrorShader = {
     try {
-      MirrorShader.compileShader(location, shaderType, resourceManager)
+      MirrorShader.compile(location, shaderType, resourceManager)
     } catch {
       case e: IOException =>
         MirrorLogHelper.warn(s"Failed to load shader: $location", e)
@@ -60,17 +63,30 @@ class ShaderManager(resourceManager: IResourceManager) extends IResourceManagerR
     }
   }
 
-  def createShaderProgram(
+  def createProgram(
+      location: ResourceLocation,
+      shaderTypes: util.List[ShaderType],
+      uniforms: util.List[UniformBase],
+      strictUniforms: Boolean
+  ): MirrorShaderProgram = createProgram(location, shaderTypes.asScala, uniforms.asScala, strictUniforms)
+
+  def createProgram(
       location: ResourceLocation,
       shaderTypes: Seq[ShaderType],
       uniforms: Seq[UniformBase],
-      strictUniforms: Boolean = false
+      strictUniforms: Boolean = true
   ): MirrorShaderProgram = {
     val shaders = shaderTypes.map(_ -> location).toMap
-    createShaderProgram(shaders, uniforms, strictUniforms)
+    createComplexProgram(shaders, uniforms, strictUniforms)
   }
 
-  def createShaderProgram(
+  def createComplexProgram(
+      shaders: util.Map[ShaderType, ResourceLocation],
+      uniforms: util.List[UniformBase],
+      strictUniforms: Boolean
+  ): MirrorShaderProgram = createComplexProgram(shaders.asScala.toMap, uniforms.asScala, strictUniforms)
+
+  def createComplexProgram(
       shaders: Map[ShaderType, ResourceLocation],
       uniforms: Seq[UniformBase],
       strictUniforms: Boolean
@@ -96,19 +112,27 @@ class ShaderManager(resourceManager: IResourceManager) extends IResourceManagerR
     }
   }
 
-  def initShader(
+  def initProgram(
+      shaderLocation: ResourceLocation,
+      shaderTypes: util.List[ShaderType],
+      uniforms: util.List[UniformBase],
+      init: Consumer[MirrorShaderProgram]
+  ): Unit =
+    initProgram(shaderLocation, shaderTypes.asScala, uniforms.asScala, program => init.accept(program))
+
+  def initProgram(
       shaderLocation: ResourceLocation,
       shaderTypes: Seq[ShaderType],
       uniforms: Seq[UniformBase],
       init: MirrorShaderProgram => Unit
   ): Unit = {
     shaderProgramsInits.addBinding(shaderLocation, init)
-    val shader =
-      shaderPrograms.getOrElseUpdate(shaderLocation, createShaderProgram(shaderLocation, shaderTypes, uniforms))
-    init(shader)
+    val program =
+      shaderPrograms.getOrElseUpdate(shaderLocation, createProgram(shaderLocation, shaderTypes, uniforms))
+    init(program)
   }
 
-  def getShaderProgram(shaderLocation: ResourceLocation): Option[MirrorShaderProgram] =
+  def getProgram(shaderLocation: ResourceLocation): Option[MirrorShaderProgram] =
     shaderPrograms.get(shaderLocation)
 
   override def onResourceManagerReload(resourceManager: IResourceManager): Unit = {
@@ -129,7 +153,7 @@ class ShaderManager(resourceManager: IResourceManager) extends IResourceManagerR
     val res = for ((resource, program) <- shaderPrograms) yield {
       programBar.step(resource.toString)
       program.delete()
-      val newProgram = createShaderProgram(resource, program.shaders.map(_.shaderType), program.uniformMap.map {
+      val newProgram = createProgram(resource, program.shaders.map(_.shaderType), program.uniformMap.map {
         case (name, uniform) => UniformBase(name, uniform.tpe, uniform.count)
       }.toSeq)
       shaderProgramsInits.get(resource).foreach(_.foreach(init => init(newProgram)))
@@ -143,4 +167,4 @@ class ShaderManager(resourceManager: IResourceManager) extends IResourceManagerR
 }
 
 @SideOnly(Side.CLIENT)
-object ShaderManager extends ShaderManager(Minecraft.getMinecraft.getResourceManager)
+object ShaderManager extends ShaderManagerBase(Minecraft.getMinecraft.getResourceManager)

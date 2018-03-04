@@ -81,12 +81,12 @@ object MirrorImplicits {
     def asScala: A => Unit = a => function.accept(a)
   }
 
-  implicit class RickOptional[A](val optional: Optional[A]) extends AnyVal {
+  implicit class RichOptional[A](val optional: Optional[A]) extends AnyVal {
 
     def toOption: Option[A] = if (optional.isPresent) Some(optional.get()) else None
   }
 
-  implicit class RickOption[A](val option: Option[A]) extends AnyVal {
+  implicit class RichOption[A](val option: Option[A]) extends AnyVal {
 
     def toOptional: Optional[A] = option.fold(Optional.empty[A])(Optional.of)
   }

@@ -46,16 +46,16 @@ object MirrorShader {
 
   private val Include = """#pragma Mirror include "(.+)"""".r
 
-  def missingShader(tpe: ShaderType) = MirrorShader(0, tpe)
+  private[mirror] def missingShader(tpe: ShaderType) = MirrorShader(0, tpe)
 
   @throws[ShaderException]
   @throws[IOException]
-  def compileShader(
+  def compile(
       location: ResourceLocation,
       shaderType: ShaderType,
       resourceManager: IResourceManager
   ): MirrorShader = {
-    val shaderSource = parseShader(location, resourceManager).mkString("\n")
+    val shaderSource = parseShaderSource(location, resourceManager).mkString("\n")
 
     val buffer = BufferUtils.createByteBuffer(shaderSource.length)
     buffer.put(shaderSource.getBytes)
@@ -72,7 +72,7 @@ object MirrorShader {
   }
 
   @throws[IOException]
-  def parseShader(location: ResourceLocation, resourceManager: IResourceManager): Seq[String] = {
+  private[mirror] def parseShaderSource(location: ResourceLocation, resourceManager: IResourceManager): Seq[String] = {
     var resource: IResource = null
     try {
       resource = resourceManager.getResource(location)
@@ -93,7 +93,7 @@ object MirrorShader {
             }
           }
 
-          parseShader(includeLocation, resourceManager)
+          parseShaderSource(includeLocation, resourceManager)
         case other => Seq(other)
       }
     } finally {
