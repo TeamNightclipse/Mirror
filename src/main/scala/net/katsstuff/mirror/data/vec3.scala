@@ -703,9 +703,9 @@ object Vector3 {
   implicit class WrappedVec3i(val toVec3i: Vec3i) extends AnyVal with AbstractVector3 {
 
     override type Self = WrappedVec3i
-    override def x: Double = toVec3i.x
-    override def y: Double = toVec3i.y
-    override def z: Double = toVec3i.z
+    override def x: Double = toVec3i.getX
+    override def y: Double = toVec3i.getY
+    override def z: Double = toVec3i.getZ
 
     override def create(x: Double, y: Double, z: Double): WrappedVec3i   = new Vec3i(x, y, z)
     override def asMutable:                               MutableVector3 = MutableVector3(x, y, z)
