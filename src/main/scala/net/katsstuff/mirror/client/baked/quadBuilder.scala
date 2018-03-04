@@ -2,6 +2,7 @@ package net.katsstuff.mirror.client.baked
 
 import java.util
 
+import scala.annotation.varargs
 import scala.collection.JavaConverters._
 
 import org.lwjgl.util.vector.Vector4f
@@ -118,7 +119,7 @@ class QuadBuilder private (
 
   def clear: QuadBuilder = copy(facingMap = Map.empty)
 
-  def rotate(facing: EnumFacing, exclude: EnumFacing*): QuadBuilder = {
+  @varargs def rotate(facing: EnumFacing, exclude: EnumFacing*): QuadBuilder = {
     if (!exclude.contains(facing)) {
       import EnumFacing._
       facing match {

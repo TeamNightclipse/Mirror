@@ -23,6 +23,7 @@ package net.katsstuff.mirror.client.helper
 import java.util
 import java.util.function.BooleanSupplier
 
+import scala.annotation.varargs
 import scala.collection.JavaConverters._
 import scala.language.implicitConversions
 
@@ -38,10 +39,10 @@ case class Tooltip(objs: Seq[String], lines: Seq[String]) {
 
   def condition(condition: KeyCondition): Condition = condition(this)
 
-  def add(obj: AnyRef, formats: TextFormatting*): Tooltip =
+  @varargs def add(obj: AnyRef, formats: TextFormatting*): Tooltip =
     Tooltip(objs ++ formats.map(_.toString) :+ String.valueOf(obj), lines)
 
-  def addI18n(i18n: String, formats: TextFormatting*): Tooltip =
+  @varargs def addI18n(i18n: String, formats: TextFormatting*): Tooltip =
     add(I18n.format(i18n), formats: _*)
 
   def newline: Tooltip = Tooltip(Seq.empty, lines :+ objs.mkString)
