@@ -183,7 +183,7 @@ abstract sealed class AbstractQuat { self =>
 
   def *(vec3: AbstractVector3): vec3.Self = rotate(vec3)
 
-  def conjugate: Self = create(-x, -y, -z, w)
+  lazy val conjugate: Self = create(-x, -y, -z, w)
 
   //https://github.com/libgdx/libgdx/blob/master/gdx/src/com/badlogic/gdx/math/Quaternion.java#L210
   def normalize: Self = {
