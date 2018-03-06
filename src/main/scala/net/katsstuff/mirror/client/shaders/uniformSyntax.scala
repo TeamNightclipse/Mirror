@@ -29,7 +29,7 @@ class UniformSyntax(val program: MirrorShaderProgram) extends AnyVal with Dynami
   def selectDynamic[A <: UniformType](
       name: String
   )(implicit mkSyntax: UniformTypeMkSyntax[A], tpe: A): mkSyntax.Syntax = {
-    val uniform = program.getUniform(name).filter(_.tpe == tpe).getOrElse(new NOOPUniform(tpe, 1))
+    val uniform = program.getUniformS(name).filter(_.tpe == tpe).getOrElse(new NOOPUniform(tpe, 1))
     mkSyntax.mkSyntax(uniform)
   }
 }
