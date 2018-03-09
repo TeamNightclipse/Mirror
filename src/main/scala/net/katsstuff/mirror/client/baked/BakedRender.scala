@@ -1,10 +1,8 @@
 package net.katsstuff.mirror.client.baked
 
 import java.util
-
+import java.util.function
 import javax.annotation.Nullable
-
-import scala.collection.JavaConverters._
 
 import net.katsstuff.mirror.Mirror
 import net.katsstuff.mirror.client.helper.ResourceHelperS
@@ -12,14 +10,23 @@ import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.block.model.{BakedQuad, ItemCameraTransforms, ItemOverrideList}
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
+import net.minecraft.client.renderer.vertex.VertexFormat
 import net.minecraft.util.{EnumFacing, ResourceLocation}
 import net.minecraftforge.common.model.TRSRTransformation
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
+
+import scala.collection.JavaConverters._
 
 @SideOnly(Side.CLIENT) class BakedRender extends BakedPerspective {
   private var transforms = BakedPerspective.BlockTransforms
 
   private var particle: ResourceLocation = ResourceHelperS.getAtlas(Mirror.Id, None, "null")
+
+  override def applyFormat(format: VertexFormat): Baked = this
+
+  override def applyTextures(sprites: function.Function[ResourceLocation, TextureAtlasSprite]): Baked = this
+
+  override def getTextures: Array[ResourceLocation] = Array.apply(getParticle)
 
   override def getQuads(@Nullable state: IBlockState, @Nullable side: EnumFacing, rand: Long): util.List[BakedQuad] =
     Nil.asJava

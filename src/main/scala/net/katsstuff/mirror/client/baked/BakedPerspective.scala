@@ -1,14 +1,13 @@
 package net.katsstuff.mirror.client.baked
 
 import java.util
-
 import javax.vecmath.{Matrix4f, Vector3f}
-
-import scala.collection.JavaConverters._
 
 import net.minecraft.client.renderer.block.model.{IBakedModel, ItemCameraTransforms}
 import net.minecraftforge.common.model.TRSRTransformation
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
+
+import scala.collection.JavaConverters._
 
 @SideOnly(Side.CLIENT)
 object BakedPerspective {
@@ -35,7 +34,7 @@ object BakedPerspective {
     )
 }
 @SideOnly(Side.CLIENT)
-abstract class BakedPerspective extends IBakedModel {
+abstract class BakedPerspective extends IBakedModel with Baked {
 
   import org.apache.commons.lang3.tuple.Pair
 
