@@ -89,7 +89,7 @@ val shade by configurations.creating
 configurations.compile.extendsFrom(shade)
 
 dependencies {
-    shade("com.chuusai:shapeless_2.11:2.3.2") {
+    shade("com.chuusai:shapeless_2.11:2.3.3") {
         exclude(group = "org.scala-lang")
     }
 

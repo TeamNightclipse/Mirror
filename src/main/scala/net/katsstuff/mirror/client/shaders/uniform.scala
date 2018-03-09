@@ -28,9 +28,9 @@ import org.lwjgl.util.vector.{Matrix2f, Matrix3f, Matrix4f}
 import net.minecraft.client.renderer.OpenGlHelper
 
 //Copied from ShaderUniform
-class MirrorUniform(
+class MirrorUniform[+Type <: UniformType](
     location: Int,
-    val tpe: UniformType,
+    val tpe: Type,
     val count: Int,
     intBuffer: IntBuffer,
     floatBuffer: FloatBuffer
@@ -254,72 +254,91 @@ class MirrorUniform(
   def upload(): Unit = {
     if (dirty) {
       dirty = false
-      tpe match {
-        //Upload int
-        case UniformType.UnInt => OpenGlHelper.glUniform1(location, intBuffer)
-        case UniformType.IVec2 => OpenGlHelper.glUniform2(location, intBuffer)
-        case UniformType.IVec3 => OpenGlHelper.glUniform3(location, intBuffer)
-        case UniformType.IVec4 => OpenGlHelper.glUniform4(location, intBuffer)
-        //Upload float
-        case UniformType.UnFloat => OpenGlHelper.glUniform1(location, floatBuffer)
-        case UniformType.Vec2    => OpenGlHelper.glUniform2(location, floatBuffer)
-        case UniformType.Vec3    => OpenGlHelper.glUniform3(location, floatBuffer)
-        case UniformType.Vec4    => OpenGlHelper.glUniform4(location, floatBuffer)
-        //Upload float matrix
-        case UniformType.Mat2 => OpenGlHelper.glUniformMatrix2(location, true, floatBuffer)
-        case UniformType.Mat3 => OpenGlHelper.glUniformMatrix3(location, true, floatBuffer)
-        case UniformType.Mat4 => OpenGlHelper.glUniformMatrix4(location, true, floatBuffer)
-      }
+      tpe.upload(location, intBuffer, floatBuffer)
     }
   }
 }
 object MirrorUniform {
 
-  private[mirror] def create(location: Int, tpe: UniformType, count: Int): MirrorUniform =
-    if (tpe.floatBuffer)
+  private[mirror] def create[Type <: UniformType](location: Int, tpe: Type, count: Int): MirrorUniform[Type] =
+    if (tpe.useFloatBuffer)
       new MirrorUniform(location, tpe, count, null, BufferUtils.createFloatBuffer(count * tpe.bufferSize))
     else new MirrorUniform(location, tpe, count, BufferUtils.createIntBuffer(count * tpe.bufferSize), null)
 }
 
-sealed abstract class UniformType(val floatBuffer: Boolean, val bufferSize: Int) {
+sealed abstract class UniformType(val useFloatBuffer: Boolean, val bufferSize: Int) {
   def instance: UniformType = this
+  def upload(location: Int, intBuffer: IntBuffer, floatBuffer: FloatBuffer): Unit
 }
 object UniformType {
-  sealed trait UnInt         extends UniformType
+  sealed trait UnInt extends UniformType {
+    override def upload(location: Int, intBuffer: IntBuffer, floatBuffer: FloatBuffer): Unit =
+      OpenGlHelper.glUniform1(location, intBuffer)
+  }
   implicit case object UnInt extends UniformType(false, 1) with UnInt
 
-  sealed trait IVec2         extends UniformType
+  sealed trait IVec2 extends UniformType {
+    override def upload(location: Int, intBuffer: IntBuffer, floatBuffer: FloatBuffer): Unit =
+      OpenGlHelper.glUniform2(location, intBuffer)
+  }
   implicit case object IVec2 extends UniformType(false, 2) with IVec2
 
-  sealed trait IVec3         extends UniformType
+  sealed trait IVec3 extends UniformType {
+    override def upload(location: Int, intBuffer: IntBuffer, floatBuffer: FloatBuffer): Unit =
+      OpenGlHelper.glUniform3(location, intBuffer)
+  }
   implicit case object IVec3 extends UniformType(false, 3) with IVec3
 
-  sealed trait IVec4         extends UniformType
+  sealed trait IVec4 extends UniformType {
+    override def upload(location: Int, intBuffer: IntBuffer, floatBuffer: FloatBuffer): Unit =
+      OpenGlHelper.glUniform4(location, intBuffer)
+  }
   implicit case object IVec4 extends UniformType(false, 4) with IVec4
 
-  sealed trait UnFloat         extends UniformType
+  sealed trait UnFloat extends UniformType {
+    override def upload(location: Int, intBuffer: IntBuffer, floatBuffer: FloatBuffer): Unit =
+      OpenGlHelper.glUniform1(location, floatBuffer)
+  }
   implicit case object UnFloat extends UniformType(true, 1) with UnFloat
 
-  sealed trait Vec2         extends UniformType
+  sealed trait Vec2 extends UniformType {
+    override def upload(location: Int, intBuffer: IntBuffer, floatBuffer: FloatBuffer): Unit =
+      OpenGlHelper.glUniform2(location, floatBuffer)
+  }
   implicit case object Vec2 extends UniformType(true, 2) with Vec2
 
-  sealed trait Vec3         extends UniformType
+  sealed trait Vec3 extends UniformType {
+    override def upload(location: Int, intBuffer: IntBuffer, floatBuffer: FloatBuffer): Unit =
+      OpenGlHelper.glUniform3(location, floatBuffer)
+  }
   implicit case object Vec3 extends UniformType(true, 3) with Vec3
 
-  sealed trait Vec4         extends UniformType
+  sealed trait Vec4 extends UniformType {
+    override def upload(location: Int, intBuffer: IntBuffer, floatBuffer: FloatBuffer): Unit =
+      OpenGlHelper.glUniform4(location, floatBuffer)
+  }
   implicit case object Vec4 extends UniformType(true, 4) with Vec4
 
-  sealed trait Mat2         extends UniformType
+  sealed trait Mat2 extends UniformType {
+    override def upload(location: Int, intBuffer: IntBuffer, floatBuffer: FloatBuffer): Unit =
+      OpenGlHelper.glUniformMatrix2(location, true, floatBuffer)
+  }
   implicit case object Mat2 extends UniformType(true, 4) with Mat2
 
-  sealed trait Mat3         extends UniformType
+  sealed trait Mat3 extends UniformType {
+    override def upload(location: Int, intBuffer: IntBuffer, floatBuffer: FloatBuffer): Unit =
+      OpenGlHelper.glUniformMatrix3(location, true, floatBuffer)
+  }
   implicit case object Mat3 extends UniformType(true, 9) with Mat3
 
-  sealed trait Mat4         extends UniformType
+  sealed trait Mat4 extends UniformType {
+    override def upload(location: Int, intBuffer: IntBuffer, floatBuffer: FloatBuffer): Unit =
+      OpenGlHelper.glUniformMatrix4(location, true, floatBuffer)
+  }
   implicit case object Mat4 extends UniformType(true, 16) with Mat4
 }
 
-case class UniformBase(name: String, tpe: UniformType, count: Int)
+case class UniformBase[+Type <: UniformType](tpe: Type, count: Int)
 
 class NOOPUniform(tpe: UniformType, count: Int) extends MirrorUniform(0, tpe, count, null, null) {
   override def setIdx(f: Float, idx: Int):                                   Unit = ()

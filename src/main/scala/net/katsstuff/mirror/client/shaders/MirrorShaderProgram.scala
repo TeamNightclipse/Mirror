@@ -26,11 +26,15 @@ import java.util.Optional
 import scala.collection.JavaConverters._
 
 import net.katsstuff.mirror.scalastuff.MirrorImplicits._
-
 import net.minecraft.client.renderer.OpenGlHelper
 import net.minecraft.util.ResourceLocation
+import shapeless._
 
-case class MirrorShaderProgram(shaders: Seq[MirrorShader], programId: Int, uniformMap: Map[String, MirrorUniform]) {
+case class MirrorShaderProgram(
+    shaders: Seq[MirrorShader],
+    programId: Int,
+    uniformMap: Map[String, MirrorUniform[_ <: UniformType]]
+) {
 
   def delete(): Unit = {
     shaders.foreach(_.delete())
@@ -40,32 +44,30 @@ case class MirrorShaderProgram(shaders: Seq[MirrorShader], programId: Int, unifo
   def begin(): Unit =
     OpenGlHelper.glUseProgram(programId)
 
-  def getUniformS(name: String): Option[MirrorUniform] = uniformMap.get(name)
+  def getUniformS(name: String): Option[MirrorUniform[_ <: UniformType]] = uniformMap.get(name)
 
-  def getUniformJ(name: String): Optional[MirrorUniform] = uniformMap.get(name).toOptional
+  def getUniformJ(name: String): Optional[MirrorUniform[_ <: UniformType]] = uniformMap.get(name).toOptional
 
   def uploadUniforms(): Unit = uniformMap.values.foreach(_.upload())
 
   def end(): Unit = OpenGlHelper.glUseProgram(0)
-
-  def uniforms: UniformSyntax = new UniformSyntax(this)
 }
 object MirrorShaderProgram {
 
-  private[mirror] def missingShaderProgram(shaders: Seq[MirrorShader], uniforms: Seq[UniformBase]) =
-    MirrorShaderProgram(shaders, 0, uniforms.map(base => base.name -> new NOOPUniform(base.tpe, base.count)).toMap)
+  def missingShaderProgram(shaders: Seq[MirrorShader], uniforms: Map[String, UniformBase[_ <: UniformType]]) =
+    MirrorShaderProgram(shaders, 0, uniforms.map { case (name, base) => name -> new NOOPUniform(base.tpe, base.count) })
 
   @throws[ShaderException]
   def create(
       shaders: util.Map[ResourceLocation, MirrorShader],
-      uniforms: util.List[UniformBase],
+      uniforms: util.Map[String, UniformBase[_ <: UniformType]],
       strictUniforms: Boolean
-  ): MirrorShaderProgram = create(shaders.asScala.toMap, uniforms.asScala, strictUniforms)
+  ): MirrorShaderProgram = create(shaders.asScala.toMap, uniforms.asScala.toMap, strictUniforms)
 
   @throws[ShaderException]
   def create(
       shaders: Map[ResourceLocation, MirrorShader],
-      uniforms: Seq[UniformBase],
+      uniforms: Map[String, UniformBase[_ <: UniformType]],
       strictUniforms: Boolean = true
   ): MirrorShaderProgram = {
     val programId = OpenGlHelper.glCreateProgram()
@@ -82,7 +84,7 @@ object MirrorShaderProgram {
     }
 
     val uniformMap = uniforms.map {
-      case UniformBase(name, tpe, count) =>
+      case (name, UniformBase(tpe, count)) =>
         val location = OpenGlHelper.glGetUniformLocation(programId, name)
         if (location == -1) {
           if (strictUniforms) {
@@ -90,9 +92,28 @@ object MirrorShaderProgram {
           } else new NOOPUniform(tpe, count)
         }
         name -> MirrorUniform.create(location, tpe, count)
-    }.toMap
+    }
 
     MirrorShaderProgram(shaders.values.toSeq, programId, uniformMap)
+  }
+
+  @throws[ShaderException]
+  def createTyped[Uniforms <: HList](
+      shaders: Map[ResourceLocation, MirrorShader],
+      uniforms: Uniforms,
+      strictUniforms: Boolean = true
+  )(
+      implicit toMap: ops.record.ToMap.Aux[Uniforms, String, UniformBase[_ <: UniformType]],
+      mapCreateKey: ops.hlist.Mapper[ShaderProgramKey.mapUniforms.type, Uniforms]
+  ): (mapCreateKey.Out, MirrorShaderProgram) = {
+    val keyRecord = mapCreateKey(uniforms)
+    val program   = create(shaders, toMap(uniforms), strictUniforms)
+    (keyRecord, program)
+  }
+
+  case class TypeLevelProgram[Uniforms <: HList](program: MirrorShaderProgram, uniformsList: Uniforms) {
+
+    def uniforms: UniformSyntax[Uniforms] = new UniformSyntax(this)
   }
 
 }
