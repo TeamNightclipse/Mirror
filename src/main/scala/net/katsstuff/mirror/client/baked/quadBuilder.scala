@@ -2,19 +2,18 @@ package net.katsstuff.mirror.client.baked
 
 import java.util
 
-import scala.annotation.varargs
-import scala.collection.JavaConverters._
-
-import org.lwjgl.util.vector.Vector4f
-
 import net.katsstuff.mirror.client.ClientProxy
-import net.katsstuff.mirror.data.{MutableVector3, Vector3}
+import net.katsstuff.mirror.data.{MutableVector3, Quat, Vector3}
 import net.minecraft.client.renderer.block.model.BakedQuad
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.client.renderer.vertex.VertexFormat
 import net.minecraft.util.EnumFacing
 import net.minecraftforge.client.model.pipeline.UnpackedBakedQuad
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
+import org.lwjgl.util.vector.Vector4f
+
+import scala.annotation.varargs
+import scala.collection.JavaConverters._
 
 @SideOnly(Side.CLIENT)
 object QuadBuilder {
@@ -112,7 +111,10 @@ class QuadBuilder private (
 
   def mirror: QuadBuilder = {
     facingMap.get(last) match {
-      case Some(holder) => copy(facingMap = facingMap.updated(last, holder.rotate(180D, last.getAxis)))
+      case Some(holder) => {
+        val quat = Quat.fromAxisAngle(last.getAxis, 180D)
+        copy(facingMap = facingMap.updated(last, holder.rotate(quat)))
+      }
       case None         => this
     }
   }
@@ -136,9 +138,8 @@ class QuadBuilder private (
   }
 
   def rotate(axis: EnumFacing.Axis, angle: Float): QuadBuilder = {
-    val newMap = facingMap.map {
-      case (facing, holder) => facing -> holder.rotate(angle, axis)
-    }
+    val quat = Quat.fromAxisAngle(axis, angle)
+    val newMap = facingMap.map(e => e._1 -> e._2.rotate(quat))
     copy(facingMap = newMap)
   }
 
@@ -216,7 +217,7 @@ private case class QuadHolder(
   private[baked] def mapVectors(f: Vector3 => Vector3): QuadHolder = QuadHolder(sprite, f(a), f(b), f(c), f(d), uv)
 
   //TODO: Can we instead rotate by a quat made from offsetting the axis here, and save computations?
-  private[baked] def rotate(angle: Double, axis: EnumFacing.Axis): QuadHolder = mapVectors { vec =>
-    vec.asMutable.subtractMutable(0.5D).rotateMutable(angle, axis).addMutable(0.5D).asImmutable
+  private[baked] def rotate(quat: Quat): QuadHolder = mapVectors { vec =>
+    vec.asMutable.subtractMutable(0.5D).rotate(quat).addMutable(0.5D).asImmutable
   }
 }
