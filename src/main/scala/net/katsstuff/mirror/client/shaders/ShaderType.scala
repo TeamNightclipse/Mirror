@@ -22,10 +22,11 @@ package net.katsstuff.mirror.client.shaders
 
 import net.minecraft.client.renderer.OpenGlHelper
 
-sealed abstract case class ShaderType(constant: Int, extension: String) {
-  def instance: ShaderType = this
-}
+sealed abstract case class ShaderType(constant: Int, extension: String)
 object ShaderType {
   object Vertex   extends ShaderType(OpenGlHelper.GL_VERTEX_SHADER, "vsh")
+  def vertex: Vertex.type = Vertex
+
   object Fragment extends ShaderType(OpenGlHelper.GL_FRAGMENT_SHADER, "fsh")
+  def fragment: Fragment.type = Fragment
 }

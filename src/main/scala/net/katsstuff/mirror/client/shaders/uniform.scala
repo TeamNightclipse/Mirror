@@ -267,7 +267,6 @@ object MirrorUniform {
 }
 
 sealed abstract class UniformType(val useFloatBuffer: Boolean, val bufferSize: Int) {
-  def instance: UniformType = this
   def upload(location: Int, intBuffer: IntBuffer, floatBuffer: FloatBuffer): Unit
 }
 object UniformType {
@@ -276,66 +275,77 @@ object UniformType {
       OpenGlHelper.glUniform1(location, intBuffer)
   }
   implicit case object UnInt extends UniformType(false, 1) with UnInt
+  def unInt: UnInt.type = UnInt
 
   sealed trait IVec2 extends UniformType {
     override def upload(location: Int, intBuffer: IntBuffer, floatBuffer: FloatBuffer): Unit =
       OpenGlHelper.glUniform2(location, intBuffer)
   }
   implicit case object IVec2 extends UniformType(false, 2) with IVec2
+  def iVec2: IVec2.type = IVec2
 
   sealed trait IVec3 extends UniformType {
     override def upload(location: Int, intBuffer: IntBuffer, floatBuffer: FloatBuffer): Unit =
       OpenGlHelper.glUniform3(location, intBuffer)
   }
   implicit case object IVec3 extends UniformType(false, 3) with IVec3
+  def iVec3: IVec3.type = IVec3
 
   sealed trait IVec4 extends UniformType {
     override def upload(location: Int, intBuffer: IntBuffer, floatBuffer: FloatBuffer): Unit =
       OpenGlHelper.glUniform4(location, intBuffer)
   }
   implicit case object IVec4 extends UniformType(false, 4) with IVec4
+  def iVec4: IVec4.type = IVec4
 
   sealed trait UnFloat extends UniformType {
     override def upload(location: Int, intBuffer: IntBuffer, floatBuffer: FloatBuffer): Unit =
       OpenGlHelper.glUniform1(location, floatBuffer)
   }
   implicit case object UnFloat extends UniformType(true, 1) with UnFloat
+  def unFloat: UnFloat.type = UnFloat
 
   sealed trait Vec2 extends UniformType {
     override def upload(location: Int, intBuffer: IntBuffer, floatBuffer: FloatBuffer): Unit =
       OpenGlHelper.glUniform2(location, floatBuffer)
   }
   implicit case object Vec2 extends UniformType(true, 2) with Vec2
+  def vec2: Vec2.type = Vec2
 
   sealed trait Vec3 extends UniformType {
     override def upload(location: Int, intBuffer: IntBuffer, floatBuffer: FloatBuffer): Unit =
       OpenGlHelper.glUniform3(location, floatBuffer)
   }
   implicit case object Vec3 extends UniformType(true, 3) with Vec3
+  def vec3: Vec3.type = Vec3
 
   sealed trait Vec4 extends UniformType {
     override def upload(location: Int, intBuffer: IntBuffer, floatBuffer: FloatBuffer): Unit =
       OpenGlHelper.glUniform4(location, floatBuffer)
   }
   implicit case object Vec4 extends UniformType(true, 4) with Vec4
+  def vec4: Vec4.type = Vec4
 
   sealed trait Mat2 extends UniformType {
     override def upload(location: Int, intBuffer: IntBuffer, floatBuffer: FloatBuffer): Unit =
       OpenGlHelper.glUniformMatrix2(location, true, floatBuffer)
   }
   implicit case object Mat2 extends UniformType(true, 4) with Mat2
+  def mat2: Mat2.type = Mat2
 
   sealed trait Mat3 extends UniformType {
     override def upload(location: Int, intBuffer: IntBuffer, floatBuffer: FloatBuffer): Unit =
       OpenGlHelper.glUniformMatrix3(location, true, floatBuffer)
   }
   implicit case object Mat3 extends UniformType(true, 9) with Mat3
+  def mat3: Mat3.type = Mat3
 
   sealed trait Mat4 extends UniformType {
     override def upload(location: Int, intBuffer: IntBuffer, floatBuffer: FloatBuffer): Unit =
       OpenGlHelper.glUniformMatrix4(location, true, floatBuffer)
   }
   implicit case object Mat4 extends UniformType(true, 16) with Mat4
+  def mat4: Mat4.type = Mat4
 }
 
 case class UniformBase[+Type <: UniformType](tpe: Type, count: Int)
