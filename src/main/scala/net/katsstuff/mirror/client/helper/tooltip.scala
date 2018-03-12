@@ -97,11 +97,11 @@ case class Condition(
     present: Tooltip => Tooltip = identity,
     or: Tooltip => Tooltip = identity
 ) {
-  def ifTrue(present: Tooltip => Tooltip):                       Condition = copy(present = present)
-  def ifTrue(present: util.function.Function[Tooltip, Tooltip]): Condition = copy(present = present.asScala)
+  def ifTrue(present: Tooltip => Tooltip):                        Condition = copy(present = present)
+  def ifTrueJ(present: util.function.Function[Tooltip, Tooltip]): Condition = copy(present = present.asScala)
 
-  def orElse(or: Tooltip => Tooltip):                       Condition = copy(or = or)
-  def orElse(or: util.function.Function[Tooltip, Tooltip]): Condition = copy(or = or.asScala)
+  def orElse(or: Tooltip => Tooltip):                        Condition = copy(or = or)
+  def orElseJ(or: util.function.Function[Tooltip, Tooltip]): Condition = copy(or = or.asScala)
 
   def apply: Tooltip = if (condition()) present(tooltip) else or(tooltip)
 }
