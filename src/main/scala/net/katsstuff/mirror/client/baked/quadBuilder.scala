@@ -2,8 +2,12 @@ package net.katsstuff.mirror.client.baked
 
 import java.util
 
+import scala.annotation.varargs
+import scala.collection.JavaConverters._
+import scala.collection.mutable
+
 import net.katsstuff.mirror.client.ClientProxy
-import net.katsstuff.mirror.data.{MutableVector3, Quat, Vector3}
+import net.katsstuff.mirror.data.{Quat, Vector3}
 import net.minecraft.client.renderer.block.model.BakedQuad
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.client.renderer.vertex.VertexFormat
@@ -11,9 +15,6 @@ import net.minecraft.util.EnumFacing
 import net.minecraftforge.client.model.pipeline.UnpackedBakedQuad
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 import org.lwjgl.util.vector.Vector4f
-
-import scala.annotation.varargs
-import scala.collection.JavaConverters._
 
 @SideOnly(Side.CLIENT)
 object QuadBuilder {
@@ -76,17 +77,17 @@ class QuadBuilder private (
         )
       case NORTH =>
         (
-          Vector3(to.x, from.y, to.z),
-          Vector3(to.x, to.y, to.z),
-          Vector3(from.x, to.y, to.z),
-          Vector3(from.x, from.y, to.z)
-        )
-      case SOUTH =>
-        (
           Vector3(from.x, from.y, from.z),
           Vector3(from.x, to.y, from.z),
           Vector3(to.x, to.y, from.z),
           Vector3(to.x, from.y, from.z)
+        )
+      case SOUTH =>
+        (
+          Vector3(to.x, from.y, to.z),
+          Vector3(to.x, to.y, to.z),
+          Vector3(from.x, to.y, to.z),
+          Vector3(from.x, from.y, to.z)
         )
       case WEST =>
         (
@@ -110,10 +111,13 @@ class QuadBuilder private (
   }
 
   def mirror: QuadBuilder = {
+    import Vector3.WrappedVec3i
     facingMap.get(last) match {
       case Some(holder) => {
         val quat = Quat.fromAxisAngle(last.getAxis, 180D)
-        copy(facingMap = facingMap.updated(last, holder.rotate(quat)))
+        val vec = WrappedVec3i(last.getDirectionVec).asImmutable.rotate(quat)
+        val facing = EnumFacing.getFacingFromVector(vec.x.toFloat, vec.y.toFloat, vec.z.toFloat)
+        copy(facingMap = facingMap.updated(facing, holder.rotate(quat)))
       }
       case None         => this
     }
@@ -138,9 +142,16 @@ class QuadBuilder private (
   }
 
   def rotate(axis: EnumFacing.Axis, angle: Float): QuadBuilder = {
+    import Vector3.WrappedVec3i
     val quat = Quat.fromAxisAngle(axis, angle)
-    val newMap = facingMap.map(e => e._1 -> e._2.rotate(quat))
-    copy(facingMap = newMap)
+    val newMap: mutable.Map[EnumFacing, QuadHolder] = mutable.Map()
+    facingMap.foreach {
+      case (k: EnumFacing, v: QuadHolder) =>
+        val vec = WrappedVec3i(k.getDirectionVec).asImmutable.rotate(quat)
+        val facing = EnumFacing.getFacingFromVector(vec.x.toFloat, vec.y.toFloat, vec.z.toFloat)
+        newMap += (facing -> v.rotate(quat))
+    }
+    copy(facingMap = newMap.toMap)
   }
 
   def bake: Seq[BakedQuad] = facingMap.map(e => createQuad(e._2, e._1)).toSeq
@@ -153,7 +164,7 @@ class QuadBuilder private (
     val b      = holder.b
     val c      = holder.c
     val d      = holder.d
-    val normal = (c.asMutable -= b).crossMutable(a - b).normalizeMutable
+    val normal = (c - b).cross(a - b).normalize
 
     val builder = new UnpackedBakedQuad.Builder(format)
     putVertex(builder, normal, a.x, a.y, a.z, holder.sprite, uv.y, uv.w, hasBrightness)
@@ -167,7 +178,7 @@ class QuadBuilder private (
 
   private def putVertex(
       builder: UnpackedBakedQuad.Builder,
-      normal: MutableVector3,
+      normal: Vector3,
       x: Double,
       y: Double,
       z: Double,
@@ -195,7 +206,7 @@ class QuadBuilder private (
           }
         case NORMAL =>
           if (!ClientProxy.isOptifineInstalled && hasBrightness) builder.put(e, 0F, 1F, 0F)
-          else builder.put(e, normal.x.toFloat, normal.y.toFloat, normal.z.toFloat)
+          else builder.put(e, normal.x.toFloat, normal.y.toFloat, normal.z.toFloat, 0f)
         case _ =>
           builder.put(e)
       }
