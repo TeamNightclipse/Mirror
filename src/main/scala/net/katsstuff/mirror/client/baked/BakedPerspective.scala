@@ -12,7 +12,7 @@ import scala.collection.JavaConverters._
 @SideOnly(Side.CLIENT)
 object BakedPerspective {
   val BlockTransforms: Map[ItemCameraTransforms.TransformType, TRSRTransformation] = Map(
-    ItemCameraTransforms.TransformType.GUI                     -> mkTransform(0F, 0F, 0F, 30F, 45F, 0F, 0.64F),
+    ItemCameraTransforms.TransformType.GUI                     -> mkTransform(0F, 0F, 0F, 30F, 45F, 0F, 0.63F),
     ItemCameraTransforms.TransformType.THIRD_PERSON_RIGHT_HAND -> mkTransform(0F, 2.5F, 0F, 75F, 45F, 0F, 0.38F),
     ItemCameraTransforms.TransformType.THIRD_PERSON_LEFT_HAND  -> mkTransform(0F, 2.5F, 0F, 75F, 45F, 0F, 0.38F),
     ItemCameraTransforms.TransformType.FIRST_PERSON_RIGHT_HAND -> mkTransform(0F, 0F, 0F, 0F, 45F, 0F, 0.38F),
