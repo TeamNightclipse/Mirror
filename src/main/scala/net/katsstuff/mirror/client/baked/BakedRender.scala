@@ -4,6 +4,8 @@ import java.util
 import java.util.function
 import javax.annotation.Nullable
 
+import scala.collection.JavaConverters._
+
 import net.katsstuff.mirror.Mirror
 import net.katsstuff.mirror.client.helper.ResourceHelperS
 import net.minecraft.block.state.IBlockState
@@ -14,8 +16,6 @@ import net.minecraft.client.renderer.vertex.VertexFormat
 import net.minecraft.util.{EnumFacing, ResourceLocation}
 import net.minecraftforge.common.model.TRSRTransformation
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
-
-import scala.collection.JavaConverters._
 
 @SideOnly(Side.CLIENT) class BakedRender extends BakedPerspective {
   private var transforms = BakedPerspective.BlockTransforms
