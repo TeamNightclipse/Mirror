@@ -56,7 +56,7 @@ object MirrorRenderHelper {
 
   private val useVBO = OpenGlHelper.useVbo()
 
-  def bakeModels(): Unit = {
+  private[mirror] def bakeModels(): Unit = {
     val sphere   = new Sphere
     val cylinder = new Cylinder
     val cone     = new Cylinder
@@ -117,6 +117,10 @@ object MirrorRenderHelper {
     cubeId = createList(drawCubeRaw())
   }
 
+  /**
+    * Creates a rendering list using what is inside the function used to call this method.
+    * @return The id of the call list.
+    */
   def createList(create: => Unit): Int = {
     val res = GLAllocation.generateDisplayLists(1)
     GlStateManager.glNewList(res, GL11.GL_COMPILE)
@@ -140,21 +144,53 @@ object MirrorRenderHelper {
     GlStateManager.callList(id)
   }
 
+  /**
+    * Draws a sphere.
+    * @param color The color of the cube.
+    * @param alpha The alpha of the cube.
+    * @param dist The distance from the player. Used for LODs.
+    */
   def drawSphere(color: Int, alpha: Float, dist: Double): Unit =
     drawObj(color, alpha, dist, sphereHighId, sphereMidId, sphereLowId)
 
+  /**
+    * Draws a cylinder.
+    * @param color The color of the cube.
+    * @param alpha The alpha of the cube.
+    * @param dist The distance from the player. Used for LODs.
+    */
   def drawCylinder(color: Int, alpha: Float, dist: Double): Unit =
     drawObj(color, alpha, dist, cylinderHighId, cylinderMidId, cylinderLowId)
 
+  /**
+    * Draws a cone.
+    * @param color The color of the cube.
+    * @param alpha The alpha of the cube.
+    * @param dist The distance from the player. Used for LODs.
+    */
   def drawCone(color: Int, alpha: Float, dist: Double): Unit =
     drawObj(color, alpha, dist, coneHighId, coneMidId, coneLowId)
 
+  /**
+    * Draws a disk.
+    * @param color The color of the cube.
+    * @param alpha The alpha of the cube.
+    * @param dist The distance from the player. Used for LODs.
+    */
   def drawDisk(color: Int, alpha: Float, dist: Double): Unit =
     drawObj(color, alpha, dist, diskHighId, diskMidId, diskLowId)
 
+  /**
+    * Draws a cube.
+    * @param color The color of the cube.
+    * @param alpha The alpha of the cube.
+    */
   def drawCube(color: Int, alpha: Float): Unit =
     drawObj(color, alpha, 0F, cubeId, cubeId, cubeId)
 
+  /**
+    * Draws a raw cube using no optimizations.
+    */
   def drawCubeRaw(): Unit = {
     val tes = Tessellator.getInstance()
     val bb  = tes.getBuffer
@@ -193,6 +229,15 @@ object MirrorRenderHelper {
     tes.draw()
   }
 
+  /**
+    * Draws a sphere which drops of at the end.
+    * @param radius The radius of the sphere.
+    * @param slices How many slices on the sphere.
+    * @param stacks How many stacks on the sphere
+    * @param dropOffRate The rate at which the drop of happens.
+    * @param color The color of the sphere.
+    * @param alpha The alpha of the sphere.
+    */
   def renderDropOffSphere(
       radius: Float,
       slices: Int,
@@ -252,6 +297,9 @@ object MirrorRenderHelper {
     GlStateManager.depthMask(true)
   }
 
+  /**
+    * Registers a resource manager reload listener if possible.
+    */
   def registerResourceReloadListener(listener: IResourceManagerReloadListener): Unit = {
     Minecraft.getMinecraft.getResourceManager match {
       case resourceManager: SimpleReloadableResourceManager => resourceManager.registerReloadListener(listener)
@@ -259,6 +307,9 @@ object MirrorRenderHelper {
     }
   }
 
+  /**
+    * Renders an itemstack.
+    */
   def renderItemStack(stack: ItemStack): Unit = {
     val isBlock = stack.getItem.isInstanceOf[ItemBlock]
 

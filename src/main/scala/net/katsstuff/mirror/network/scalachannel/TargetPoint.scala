@@ -24,13 +24,38 @@ import net.katsstuff.mirror.data.Vector3
 import net.minecraft.entity.Entity
 import net.minecraftforge.fml.common.network.NetworkRegistry
 
+/**
+  * A custom target point used by the scala network wrapper. Should hopefully be easier to work with.
+  * @param dimension The dimension id this targets.
+  * @param x The x coordinate this targets.
+  * @param y The y coordinate this targets.
+  * @param z The z coordinate this targets.
+  * @param range The range of this point.
+  */
 case class TargetPoint(dimension: Int, x: Double, y: Double, z: Double, range: Double) {
-  def toMinecraft: NetworkRegistry.TargetPoint = new NetworkRegistry.TargetPoint(dimension, x, y, z, range)
+
+  /**
+    * Converts this point to the forge variant.
+    * @return
+    */
+  def toForge: NetworkRegistry.TargetPoint = new NetworkRegistry.TargetPoint(dimension, x, y, z, range)
 }
 object TargetPoint {
+
+  /**
+    * Creates a target point around an entity.
+    * @param entity The entity to target around.
+    * @param range The range around the entity.
+    */
   def around(entity: Entity, range: Double): TargetPoint =
     TargetPoint(entity.dimension, entity.posX, entity.posY, entity.posZ, range)
 
+  /**
+    * Creates a target point around a vector.
+    * @param dimension The dimension id to send to.
+    * @param pos The vector position to send around.
+    * @param range The radius of the target point.
+    */
   def around(dimension: Int, pos: Vector3, range: Double): TargetPoint =
     TargetPoint(dimension, pos.x, pos.y, pos.z, range)
 }

@@ -20,6 +20,10 @@
  */
 package net.katsstuff.mirror.misc
 
+/**
+  * A simple specialized state monad.
+  * A helper class to be used from Scala when doing id side-effecting stuff.
+  */
 case class IdState[A](run: Int => (Int, A)) {
 
   def map[B](f: A => B): IdState[B] = IdState { i =>

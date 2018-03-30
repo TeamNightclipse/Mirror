@@ -31,10 +31,20 @@ import net.minecraft.client.renderer.vertex.{VertexFormat, VertexFormatElement}
 import net.minecraft.client.renderer.{GlStateManager, OpenGlHelper}
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
+/**
+  * Represents a VBO copy of a model with rendering wrapped around it.
+  * @param format The [[VertexFormat]] to use when rendering the model.
+  * @param arrayBuffer The place where all the rendering data is stored.
+  * @param vertexCount The vertex count of the model.
+  * @param mode The rendering mode. (drawArrays)
+  */
 //Mix of WorldVertexBufferUploader and ForgeHooksClient
 @SideOnly(Side.CLIENT)
 case class VBOModel(format: VertexFormat, arrayBuffer: MirrorArrayBuffer, vertexCount: Int, mode: Int) {
 
+  /**
+    * Draws this model.
+    */
   def draw(): Unit = {
     if (vertexCount > 0) {
       val elements = format.getElements.asScala

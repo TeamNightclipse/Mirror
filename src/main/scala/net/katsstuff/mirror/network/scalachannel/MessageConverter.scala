@@ -34,11 +34,20 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.util.text.ITextComponent
 import shapeless._
 
+/**
+  * A discriminator typeclass used for serializing sealed traits.
+  * @param byte The byte to use for this case.
+  */
 @implicitNotFound("A discriminator is needed to create a message converter for ${A}")
 case class Discriminator[A](byte: Byte)
 object Discriminator {
-  def find[A](implicit discriminator: Discriminator[A]): Discriminator[A] = discriminator
+  def apply[A](implicit discriminator: Discriminator[A]): Discriminator[A] = discriminator
 }
+
+/**
+  * A typeclass that can convert a type to and from bytes, for use in sending packets.
+  * @tparam A The type to convert.
+  */
 @implicitNotFound("Don't know how to convert ${A} to and from bytes")
 trait MessageConverter[A] { self =>
 

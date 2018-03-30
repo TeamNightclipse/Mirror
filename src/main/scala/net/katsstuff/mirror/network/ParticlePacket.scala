@@ -26,6 +26,10 @@ import net.katsstuff.mirror.network.scalachannel.{ClientMessageHandler, MessageC
 import net.minecraft.client.Minecraft
 import net.minecraft.client.network.NetHandlerPlayClient
 
+/**
+  * A packet which signals that a client should render a particle at some
+  * location with some properties.
+  */
 case class ParticlePacket(
     pos: Vector3,
     motion: Vector3,

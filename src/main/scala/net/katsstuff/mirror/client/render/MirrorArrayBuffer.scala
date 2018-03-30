@@ -27,44 +27,68 @@ import org.lwjgl.opengl.{GL11, GL15}
 import net.minecraft.client.renderer.{GlStateManager, OpenGlHelper}
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
+/**
+  * Lightly abstracts over buffers in OpenGL.
+  */
 @SideOnly(Side.CLIENT)
 class MirrorArrayBuffer(count: Int, target: Int, usage: Int) {
   private val id      = OpenGlHelper.glGenBuffers()
   private var deleted = false
 
+  /**
+    * Binds this buffer to OpenGL.
+    */
   def bindBuffer(): Unit = {
     if (deleted) throw new IllegalStateException("Deleted")
     OpenGlHelper.glBindBuffer(target, id)
   }
 
+  /**
+    * Unbinds this buffer to OpenGL.
+    */
   def unbindBuffer(): Unit = {
     if (deleted) throw new IllegalStateException("Deleted")
     OpenGlHelper.glBindBuffer(target, 0)
   }
 
+  /**
+    * Sets the data in this buffer.
+    */
   def bufferData(data: ByteBuffer): Unit = {
     bindBuffer()
     OpenGlHelper.glBufferData(target, data, usage)
     unbindBuffer()
   }
 
+  /**
+    * Sets a portion of the data in this buffer.
+    */
   def bufferSubData(offset: Int, data: ByteBuffer): Unit = {
     bindBuffer()
     GL15.glBufferSubData(target, offset, data)
     unbindBuffer()
   }
 
+  /**
+    * Calls glDrawArrays with the content of this buffer.
+    */
   def drawArrays(mode: Int): Unit = {
     if (deleted) throw new IllegalStateException("Deleted")
     GlStateManager.glDrawArrays(mode, 0, count)
   }
 
+  /**
+    * Calls glDrawElements with the content of this buffer.
+    */
   def drawElements(mode: Int, tpe: Int, offset: Int): Unit = {
     if (deleted) throw new IllegalStateException("Deleted")
     bindBuffer()
     GL11.glDrawElements(mode, count, tpe, offset)
   }
 
+  /**
+    * Deletes this buffer. Be careful about using this one.
+    */
   def delete(): Unit = {
     if (!deleted) {
       OpenGlHelper.glDeleteBuffers(id)

@@ -28,6 +28,10 @@ import net.minecraft.util.ResourceLocation
 
 object ShaderHelper {
 
+  /**
+    * Tries to load a minecraft [[ShaderGroup]]. Provided for convenience, but
+    * the Mirror shader system is recommended.
+    */
   def loadShaderGroup(resource: ResourceLocation): Try[ShaderGroup] = {
     if (ShaderLinkHelper.getStaticShaderLinkHelper == null) {
       ShaderLinkHelper.setNewStaticShaderLinkHelper()

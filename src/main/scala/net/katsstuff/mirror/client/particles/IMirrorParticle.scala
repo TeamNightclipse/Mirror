@@ -23,9 +23,20 @@ package net.katsstuff.mirror.client.particles
 import net.minecraft.client.renderer.BufferBuilder
 import net.minecraft.entity.Entity
 
+/**
+  * Represents a Mirror particle used updated on the client thread. Can inherit
+  * from the minecraft particle class, but doesn't have to.
+  */
 trait IMirrorParticle {
-  //These methods need to delegate to the respective minecraft methods
+
+  /**
+    * Called when updating this particle.
+    */
   def onUpdateGlow(): Unit
+
+  /**
+    * Called when rendering this particle.
+    */
   def renderParticleGlow(
       buffer: BufferBuilder,
       entityIn: Entity,
@@ -37,9 +48,23 @@ trait IMirrorParticle {
       rotationXZ: Float
   ): Unit
 
+  /**
+    * Checks if this particle should render.
+    */
   def shouldRender: Boolean = true
 
-  def isAdditive:  Boolean
+  /**
+    * Checks if this particle is additive.
+    */
+  def isAdditive: Boolean
+
+  /**
+    * Checks if this particle ignores depth.
+    */
   def ignoreDepth: Boolean
-  def alive:       Boolean
+
+  /**
+    * Checks if this particle is still alive.
+    */
+  def alive: Boolean
 }

@@ -25,6 +25,9 @@ import org.lwjgl.opengl.{ARBBufferObject, GL15, GLContext}
 import net.minecraft.client.renderer.OpenGlHelper
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
+/**
+  * A extension of the [[OpenGlHelper]] provided by minecraft. Contains extra constants and helpers.
+  */
 @SideOnly(Side.CLIENT)
 object MirrorOpenGLHelper {
 

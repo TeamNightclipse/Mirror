@@ -5,6 +5,11 @@ import shapeless._
 import shapeless.tag._
 import shapeless.labelled._
 
+/**
+  * A key used for typeful shader programs coming from Scala.
+  * @param location The [[ResourceLocation]] associated with this shader.
+  * @param uniforms The uniform HList used by this shader.
+  */
 case class ShaderProgramKey[+Uniforms <: HList](location: ResourceLocation, uniforms: Option[Uniforms])
 object ShaderProgramKey {
   object mapUniforms extends Poly1 {

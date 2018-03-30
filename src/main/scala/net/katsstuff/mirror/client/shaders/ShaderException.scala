@@ -20,4 +20,7 @@
  */
 package net.katsstuff.mirror.client.shaders
 
+/**
+  * An excpetion thrown if something went wrong when creating a shader.
+  */
 class ShaderException(msg: String) extends Exception(msg)

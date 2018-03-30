@@ -31,6 +31,12 @@ import net.minecraft.network.{INetHandler, Packet}
 import net.minecraftforge.fml.common.network.{FMLOutboundHandler, NetworkRegistry}
 import net.minecraftforge.fml.relauncher.Side
 
+/**
+  * A copy of the [[net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper]]
+  * to instead be more easily used from Scala. The system is typeclass based,
+  * and any type can be a packet, provided it can be serialized, and has a handler.
+  * @param channelName The name of the channel.
+  */
 class ScalaNetworkWrapper(channelName: String) {
 
   private val codec    = new ScalaIndexedMessageChannel
@@ -108,7 +114,7 @@ class ScalaNetworkWrapper(channelName: String) {
       .get(Side.SERVER)
       .attr(FMLOutboundHandler.FML_MESSAGETARGET)
       .set(FMLOutboundHandler.OutboundTarget.ALLAROUNDPOINT)
-    channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set(point.toMinecraft)
+    channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set(point.toForge)
     channels.get(Side.SERVER).writeAndFlush(message).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE)
   }
 

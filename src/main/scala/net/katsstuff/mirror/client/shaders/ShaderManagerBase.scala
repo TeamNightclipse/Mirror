@@ -40,6 +40,10 @@ import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 import shapeless._
 import shapeless.ops.record.MapValues
 
+/**
+  * A class used for managing shaders. Similar to Minecraft, [[net.minecraft.client.renderer.texture.TextureManager]].
+  * @param resourceManager The [[IResourceManager]] to use for loading shaders.
+  */
 @SideOnly(Side.CLIENT)
 class ShaderManagerBase(resourceManager: IResourceManager) extends IResourceManagerReloadListener {
   private val shaderPrograms = mutable.Map.empty[ShaderProgramKey[_ <: HList], MirrorShaderProgram]
@@ -50,9 +54,20 @@ class ShaderManagerBase(resourceManager: IResourceManager) extends IResourceMana
   private val shaderObjects = mutable.Map.empty[ResourceLocation, MirrorShader]
   MirrorRenderHelper.registerResourceReloadListener(this)
 
+  /**
+    * Gets a shader of a given type, or compiles it if it's missing.
+    * @param location Where the shader is located.
+    * @param shaderType The shader type.
+    */
   def getShader(location: ResourceLocation, shaderType: ShaderType): MirrorShader =
     shaderObjects.getOrElseUpdate(location, compileShader(location, shaderType))
 
+  /**
+    * Compiles a shader, or logs warnings if it couldn't.
+    * @param location Where the shader is located.
+    * @param shaderType The shader type.
+    * @return The compiled shader, or a dummy shader if an error occurred.
+    */
   def compileShader(location: ResourceLocation, shaderType: ShaderType): MirrorShader = {
     try {
       MirrorShader.compile(location, shaderType, resourceManager)
@@ -66,6 +81,13 @@ class ShaderManagerBase(resourceManager: IResourceManager) extends IResourceMana
     }
   }
 
+  /**
+    * Creates a shader program. Java-API.
+    * @param location The location where the shaders can be found.
+    * @param shaderTypes The shader types to compile.
+    * @param uniforms The uniforms to use.
+    * @param strictUniforms If the uniforms should be strict (error on missing uniform).
+    */
   def createProgram(
       location: ResourceLocation,
       shaderTypes: util.List[ShaderType],
@@ -73,6 +95,13 @@ class ShaderManagerBase(resourceManager: IResourceManager) extends IResourceMana
       strictUniforms: Boolean
   ): MirrorShaderProgram = createProgram(location, shaderTypes.asScala, uniforms.asScala.toMap, strictUniforms)
 
+  /**
+    * Creates a shader program. Scala-API.
+    * @param location The location where the shaders can be found.
+    * @param shaderTypes The shader types to compile.
+    * @param uniforms The uniforms to use.
+    * @param strictUniforms If the uniforms should be strict (error on missing uniform).
+    */
   def createProgram(
       location: ResourceLocation,
       shaderTypes: Seq[ShaderType],
@@ -83,12 +112,24 @@ class ShaderManagerBase(resourceManager: IResourceManager) extends IResourceMana
     createComplexProgram(shaders, uniforms, strictUniforms)
   }
 
+  /**
+    * Creates a complex shader program where the shader files are located in different places. Java-API.
+    * @param shaders A map from the shader type to their location.
+    * @param uniforms The uniforms to use.
+    * @param strictUniforms If the uniforms should be strict (error on missing uniform).
+    */
   def createComplexProgram(
       shaders: util.Map[ShaderType, ResourceLocation],
       uniforms: util.Map[String, UniformBase[_ <: UniformType]],
       strictUniforms: Boolean
   ): MirrorShaderProgram = createComplexProgram(shaders.asScala.toMap, uniforms.asScala.toMap, strictUniforms)
 
+  /**
+    * Creates a complex shader program where the shader files are located in different places. Scala-API.
+    * @param shaders A map from the shader type to their location.
+    * @param uniforms The uniforms to use.
+    * @param strictUniforms If the uniforms should be strict (error on missing uniform).
+    */
   def createComplexProgram(
       shaders: Map[ShaderType, ResourceLocation],
       uniforms: Map[String, UniformBase[_ <: UniformType]],
@@ -135,6 +176,14 @@ class ShaderManagerBase(resourceManager: IResourceManager) extends IResourceMana
     }
   }
 
+  /**
+    * Initializes a shader for use. This should be called as part of the
+    * startup loop, before a shader program is gotten. Java-API.
+    * @param shaderLocation The shader location.
+    * @param shaderTypes The shader types to compile.
+    * @param uniforms The uniforms to use.
+    * @param init The initialization function. This will also be called on reloads.
+    */
   def initProgram(
       shaderLocation: ResourceLocation,
       shaderTypes: util.List[ShaderType],
@@ -143,6 +192,14 @@ class ShaderManagerBase(resourceManager: IResourceManager) extends IResourceMana
   ): Unit =
     initProgram(shaderLocation, shaderTypes.asScala, uniforms.asScala.toMap, program => init.accept(program))
 
+  /**
+    * Initializes a shader for use. This should be called as part of the
+    * startup loop, before a shader program is gotten. Scala-API.
+    * @param shaderLocation The shader location.
+    * @param shaderTypes The shader types to compile.
+    * @param uniforms The uniforms to use.
+    * @param init The initialization function. This will also be called on reloads.
+    */
   def initProgram(
       shaderLocation: ResourceLocation,
       shaderTypes: Seq[ShaderType],
@@ -153,6 +210,14 @@ class ShaderManagerBase(resourceManager: IResourceManager) extends IResourceMana
     init(getOrElseAddProgram(ShaderProgramKey(shaderLocation, None), shaderTypes, uniforms, strictUniforms = true))
   }
 
+  /**
+    * Initializes a typed shader for use. This should be called as part of the
+    * startup loop, before a shader program is gotten.
+    * @param shaderLocation The shader location.
+    * @param shaderTypes The shader types to compile.
+    * @param uniforms An record of [[UniformBase]]s.
+    * @param init The initialization function. This will also be called on reloads.
+    */
   def initTypedProgram[Uniforms <: HList, Keys <: String, Values <: UniformBase[_ <: UniformType]](
       shaderLocation: ResourceLocation,
       shaderTypes: Seq[ShaderType],
@@ -172,9 +237,15 @@ class ShaderManagerBase(resourceManager: IResourceManager) extends IResourceMana
     key
   }
 
+  /**
+    * Gets a initialized program.
+    */
   def getProgram(shaderLocation: ResourceLocation): Option[MirrorShaderProgram] =
     shaderPrograms.find(_._1.location == shaderLocation).map(_._2)
 
+  /**
+    * Gets a typed program.
+    */
   def getProgram[Uniforms <: HList](
       key: ShaderProgramKey[Uniforms]
   ): Option[MirrorShaderProgram.TypeLevelProgram[Uniforms]] = {
@@ -213,5 +284,8 @@ class ShaderManagerBase(resourceManager: IResourceManager) extends IResourceMana
   }
 }
 
+/**
+  * The default shader manager to use.
+  */
 @SideOnly(Side.CLIENT)
 object ShaderManager extends ShaderManagerBase(Minecraft.getMinecraft.getResourceManager)

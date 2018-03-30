@@ -32,9 +32,17 @@ import net.minecraft.client.renderer.OpenGlHelper
 import net.minecraft.client.resources.{IResource, IResourceManager}
 import net.minecraft.util.ResourceLocation
 
+/**
+  * Represents an individual shader within Mirror.
+  * @param id The id of the shader.
+  * @param shaderType The type of the shader.
+  */
 case class MirrorShader(id: Int, shaderType: ShaderType) {
   private var deleted: Boolean = false
 
+  /**
+    * Deletes this shader. Be very careful when using this.
+    */
   def delete(): Unit = {
     if (!deleted) {
       OpenGlHelper.glDeleteShader(id)
@@ -48,6 +56,12 @@ object MirrorShader {
 
   private[mirror] def missingShader(tpe: ShaderType) = MirrorShader(0, tpe)
 
+  /**
+    * Compiles an individual shader. If you use this method, you're on your own.
+    * @param location The location of the shader.
+    * @param shaderType The shader type to compile.
+    * @param resourceManager A resource manager to load the shader from.
+    */
   @throws[ShaderException]
   @throws[IOException]
   def compile(

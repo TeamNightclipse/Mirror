@@ -27,6 +27,15 @@ import org.lwjgl.util.vector.{Matrix2f, Matrix3f, Matrix4f}
 
 import net.minecraft.client.renderer.OpenGlHelper
 
+/**
+  * Represents a uniform within a shader.
+  * @param location The location of the uniform in memory.
+  * @param tpe The uniform type.
+  * @param count The amount of uniforms. Used for arrays.
+  * @param intBuffer The int buffer for this uniform. Might not be valid given the type.
+  * @param floatBuffer The float buffer for this uniform. Might not be valid given the type.
+  * @tparam Type The type for this uniform.
+  */
 //Copied from ShaderUniform
 class MirrorUniform[+Type <: UniformType](
     location: Int,
@@ -36,7 +45,7 @@ class MirrorUniform[+Type <: UniformType](
     floatBuffer: FloatBuffer
 ) {
   var dirty = false
-
+  
   def setIdx(f: Float, idx: Int): Unit = {
     floatBuffer.position(0)
     floatBuffer.put(idx, f)

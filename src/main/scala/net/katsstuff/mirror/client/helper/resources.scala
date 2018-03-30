@@ -29,12 +29,22 @@ import com.google.common.collect.ImmutableMap
 import net.minecraft.client.renderer.block.model.{ModelResourceLocation => MRL}
 import net.minecraft.util.{IStringSerializable, ResourceLocation}
 
+/**
+  * Represents a location where resources can be found.
+  */
 trait Location {
   def rawPath: String
   def path: String = s"$rawPath/"
 }
+
+/**
+  * Represents any arbitrary location.
+  */
 case class MiscLocation(rawPath: String) extends Location
 
+/**
+  * Represents a (block) model location.
+  */
 case class ModelLocation(rawPath: String) extends Location
 object ModelLocation {
   val Block = ModelLocation("block")
@@ -42,6 +52,9 @@ object ModelLocation {
   val Obj   = ModelLocation("obj")
 }
 
+/**
+  * Represents a texture location.
+  */
 case class TextureLocation(rawPath: String) extends Location
 object TextureLocation {
   val Blocks    = TextureLocation("blocks")
@@ -53,6 +66,9 @@ object TextureLocation {
   val Model     = TextureLocation("model")
 }
 
+/**
+  * Represents a root asset location.
+  */
 case class AssetLocation(rawPath: String) extends Location
 object AssetLocation {
   val Models   = AssetLocation("models")
@@ -61,6 +77,9 @@ object AssetLocation {
   val Textures = AssetLocation("textures")
 }
 
+/**
+  * Represents a minecraft shader location.
+  */
 case class ShaderLocation(rawPath: String) extends Location
 case object ShaderLocation {
   val Post    = ShaderLocation("post")
@@ -69,6 +88,15 @@ case object ShaderLocation {
 
 trait ResourceHelperJ {
 
+  /**
+    * Gets a location based on an asset location and another location, together
+    * with a name and a suffix.
+    * @param modId The modId for this resource.
+    * @param name The name of the resource.
+    * @param asset The asset location to get the resource from.
+    * @param location The child location to get the resource from.
+    * @param suffix The suffix to append at the end.
+    */
   def getLocation(
       modId: String,
       @Nullable asset: AssetLocation,
@@ -83,25 +111,61 @@ trait ResourceHelperJ {
     new ResourceLocation(modId, builder.toString)
   }
 
+  /**
+    * Generates a [[MRL]] from a name and a variant.
+    * @param modId The modId for this resource.
+    * @param name The name of the resource.
+    * @param variant The variant to get.
+    */
   def getModel(modId: String, name: String, variant: String): MRL = {
     val atlas = getAtlas(modId, null, name)
     new MRL(atlas, variant)
   }
 
+  /**
+    * Gets a resource without an asset location.
+    * @param modId The modId for this resource.
+    * @param name The name of the resource.
+    * @param location The location to get from.
+    */
   def getAtlas(modId: String, @Nullable location: Location, name: String): ResourceLocation =
     getLocation(modId, null, location, name, "")
 
+  /**
+    * Gets a texture given a specific location.
+    * @param modId The modId for this resource.
+    * @param name The name of the resource.
+    * @param location The location within the textures folder.
+    */
   def getTexture(modId: String, @Nullable location: Location, name: String): ResourceLocation =
     getLocation(modId, AssetLocation.Textures, location, name, ".png")
 
+  /**
+    * Gets a resource without any locations.
+    * @param modId The modId for this resource.
+    * @param name The name of the resource.
+    */
   def getSimple(modId: String, name: String): ResourceLocation = getLocation(modId, null, null, name, "")
 
+  /**
+    * Generates an array from amount and a mapping function.
+    * @param amount The amount of cases to generate.
+    * @param name The base name to use for all entries.
+    * @param function The mapping function.
+    */
   def from(
       amount: Int,
       name: String,
       function: util.function.Function[String, ResourceLocation]
   ): Array[ResourceLocation] = Array.tabulate[ResourceLocation](amount)(i => function(s"$name$i"))
 
+  /**
+    * Generates map from a java enum and a mapping function.
+    * @param clazz The enum class.
+    * @param name The base name to use for all entries.
+    * @param function The mapping function.
+    * @tparam T The enum type.
+    */
   def from[T <: Enum[T] with IStringSerializable](
       clazz: Class[T],
       name: String,
@@ -119,8 +183,17 @@ object ResourceHelperStatic extends ResourceHelperJ
 
 trait ResourceHelperS {
 
+  def modId: String
+
+  /**
+    * Gets a location based on an asset location and another location, together
+    * with a name and a suffix.
+    * @param name The name of the resource.
+    * @param asset The asset location to get the resource from.
+    * @param location The child location to get the resource from.
+    * @param suffix The suffix to append at the end.
+    */
   def getLocation(
-      modId: String,
       asset: Option[AssetLocation],
       location: Option[Location],
       name: String,
@@ -133,22 +206,54 @@ trait ResourceHelperS {
     new ResourceLocation(modId, builder.toString)
   }
 
-  def getModel(modId: String, name: String, variant: String): MRL = {
-    val atlas = getAtlas(modId, null, name)
+  /**
+    * Generates a [[MRL]] from a name and a variant.
+    * @param name The name of the resource.
+    * @param variant The variant to get.
+    */
+  def getModel(name: String, variant: String): MRL = {
+    val atlas = getAtlas(None, name)
     new MRL(atlas, variant)
   }
 
-  def getAtlas(modId: String, location: Option[Location], name: String): ResourceLocation =
-    getLocation(modId, None, location, name, "")
+  /**
+    * Gets a resource without an asset location.
+    * @param name The name of the resource.
+    * @param location The location to get from.
+    */
+  def getAtlas(location: Option[Location], name: String): ResourceLocation =
+    getLocation(None, location, name, "")
 
-  def getTexture(modId: String, location: Option[Location], name: String): ResourceLocation =
-    getLocation(modId, Some(AssetLocation.Textures), location, name, ".png")
+  /**
+    * Gets a texture given a specific location.
+    * @param name The name of the resource.
+    * @param location The location within the textures folder.
+    */
+  def getTexture(location: Option[Location], name: String): ResourceLocation =
+    getLocation(Some(AssetLocation.Textures), location, name, ".png")
 
-  def getSimple(modId: String, name: String): ResourceLocation = getLocation(modId, None, None, name, "")
+  /**
+    * Gets a resource without any locations.
+    * @param name The name of the resource.
+    */
+  def getSimple(name: String): ResourceLocation = getLocation(None, None, name, "")
 
+  /**
+    * Generates a sequence from amount and a mapping function.
+    * @param amount The amount of cases to generate.
+    * @param name The base name to use for all entries.
+    * @param f The mapping function.
+    */
   def from(amount: Int, name: String, f: String => ResourceLocation): Seq[ResourceLocation] =
     Seq.tabulate[ResourceLocation](amount)(i => f(s"$name$i"))
 
+  /**
+    * Generates map from a java enum and a mapping function.
+    * @param clazz The enum class.
+    * @param name The base name to use for all entries.
+    * @param f The mapping function.
+    * @tparam T The enum type.
+    */
   def from[T <: Enum[T] with IStringSerializable](
       clazz: Class[T],
       name: String,
@@ -156,4 +261,4 @@ trait ResourceHelperS {
   ): Map[T, ResourceLocation] =
     clazz.getEnumConstants.map(enum => enum -> f(s"$name${enum.getName}")).toMap
 }
-object ResourceHelperS extends ResourceHelperS
+class ResourceHelperClass(val modId: String) extends ResourceHelperS

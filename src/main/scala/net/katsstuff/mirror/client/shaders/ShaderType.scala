@@ -22,6 +22,11 @@ package net.katsstuff.mirror.client.shaders
 
 import net.minecraft.client.renderer.OpenGlHelper
 
+/**
+  * Represents a type of shader. Mirror currently supports vertex and fragment shaders.
+  * @param constant The OpenGL constant for this shader type.
+  * @param extension The extension used by this shader type.
+  */
 sealed abstract case class ShaderType(constant: Int, extension: String)
 object ShaderType {
   object Vertex   extends ShaderType(OpenGlHelper.GL_VERTEX_SHADER, "vsh")

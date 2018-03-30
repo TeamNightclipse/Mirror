@@ -28,14 +28,18 @@ import net.minecraftforge.fml.client.FMLClientHandler
 
 object ClientProxy {
 
+  /**
+    * A quick check if optifine is installed.
+    */
   lazy val isOptifineInstalled: Boolean = FMLClientHandler.instance.hasOptifine
 }
 class ClientProxy extends CommonProxy {
 
   val particleRenderer = new ParticleRenderer
 
-  override def bakeRenderModels(): Unit = MirrorRenderHelper.bakeModels()
+  override private[mirror] def bakeRenderModels(): Unit =
+    MirrorRenderHelper.bakeModels()
 
-  override def registerRenderers(): Unit =
+  override private[mirror] def registerRenderers(): Unit =
     MinecraftForge.EVENT_BUS.register(particleRenderer)
 }

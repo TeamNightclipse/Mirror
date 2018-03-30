@@ -26,8 +26,16 @@ import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 @SideOnly(Side.CLIENT)
 case class Blending(source: GlStateManager.SourceFactor, dest: GlStateManager.DestFactor) {
+
+  /**
+    * Applies this blending mode.
+    */
   def apply(): Unit = GlStateManager.blendFunc(source, dest)
 }
+
+/**
+  * A helper for the most commonly used blending modes.
+  */
 @SideOnly(Side.CLIENT)
 object Blending {
   val Normal        = Blending(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA)

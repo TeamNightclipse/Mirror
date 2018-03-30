@@ -27,15 +27,45 @@ import net.minecraft.util.IThreadListener
 import net.minecraftforge.fml.common.FMLCommonHandler
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
+/**
+  * A type class for handling packets.
+  * @tparam A The message to handle.
+  * @tparam Reply The reply type.
+  */
 sealed trait MessageHandler[-A, Reply] {
 
+  /**
+    * Handles the packet.
+    * @param netHandler The nethandler for this side.
+    * @param a The packet instance.
+    * @return The reply, if applicable.
+    */
   def handle(netHandler: INetHandler, a: A): Option[Reply]
 
-  def side:      Side
+  /**
+    * An instance of the [[Side]] object for this side.
+    */
+  def side: Side
+
+  /**
+    * The scheduler used by this side.
+    */
   def scheduler: IThreadListener
 }
 
+/**
+  * A typeclass for handling client packets.
+  * @tparam A The message to handle.
+  * @tparam Reply The reply type.
+  */
 trait ClientMessageHandler[A, Reply] extends MessageHandler[A, Reply] with HasClientHandler[A] {
+
+  /**
+    * Handles the packet on the client side.
+    * @param netHandler The client side nethandler.
+    * @param a The packet instance.
+    * @return The reply, if applicable.
+    */
   @SideOnly(Side.CLIENT)
   def handle(netHandler: NetHandlerPlayClient, a: A): Option[Reply]
   override def handle(netHandler: INetHandler, a: A): Option[Reply] =
@@ -44,7 +74,19 @@ trait ClientMessageHandler[A, Reply] extends MessageHandler[A, Reply] with HasCl
   override def scheduler: IThreadListener = Minecraft.getMinecraft
 }
 
+/**
+  * A typeclass for handling server packets.
+  * @tparam A The message to handle.
+  * @tparam Reply The reply type.
+  */
 trait ServerMessageHandler[A, Reply] extends MessageHandler[A, Reply] with HasServerHandler[A] {
+
+  /**
+    * Handles the packet on the server side.
+    * @param netHandler The server side nethandler.
+    * @param a The packet instance.
+    * @return The reply, if applicable.
+    */
   def handle(netHandler: NetHandlerPlayServer, a: A): Option[Reply]
   override def handle(netHandler: INetHandler, a: A): Option[Reply] =
     handle(netHandler.asInstanceOf[NetHandlerPlayServer], a)

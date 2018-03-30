@@ -23,6 +23,9 @@ package net.katsstuff.mirror.network
 import net.katsstuff.mirror.Mirror
 import net.katsstuff.mirror.network.scalachannel.ScalaNetworkWrapper
 
+/**
+  * The packet handler used by Mirror.
+  */
 object MirrorPacketHandler extends ScalaNetworkWrapper(Mirror.Id) {
   private[mirror] def load(): Unit = {
     registerMessages {

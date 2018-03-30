@@ -28,6 +28,9 @@ import net.minecraft.util.IStringSerializable
 import net.minecraftforge.client.model.ModelLoader
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
+/**
+  * Various methods to aid in registering in block and item models.
+  */
 @SideOnly(Side.CLIENT)
 object ModelHelper {
 

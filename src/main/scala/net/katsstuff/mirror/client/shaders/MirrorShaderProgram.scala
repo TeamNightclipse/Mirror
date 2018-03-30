@@ -30,33 +30,65 @@ import net.minecraft.client.renderer.OpenGlHelper
 import net.minecraft.util.ResourceLocation
 import shapeless._
 
+/**
+  * Represents a Mirror shader program.
+  * @param shaders The shaders used by this program.
+  * @param programId The program id.
+  * @param uniformMap A map of the uniforms of this program.
+  */
 case class MirrorShaderProgram(
     shaders: Seq[MirrorShader],
     programId: Int,
     uniformMap: Map[String, MirrorUniform[_ <: UniformType]]
 ) {
 
+  /**
+    * Deletes this program, and all the shaders it uses. Be careful with this one.
+    */
   def delete(): Unit = {
     shaders.foreach(_.delete())
     OpenGlHelper.glDeleteProgram(programId)
   }
 
+  /**
+    * Begins to use this program.
+    */
   def begin(): Unit =
     OpenGlHelper.glUseProgram(programId)
 
+  /**
+    * Gets a uniform. Scala-API.
+    * @param name The name of the uniform.
+    */
   def getUniformS(name: String): Option[MirrorUniform[_ <: UniformType]] = uniformMap.get(name)
 
+  /**
+    * Gets a uniform. Java-API.
+    * @param name The name of the uniform.
+    */
   def getUniformJ(name: String): Optional[MirrorUniform[_ <: UniformType]] = uniformMap.get(name).toOptional
 
+  /**
+    * Uploads any dirty uniforms.
+    */
   def uploadUniforms(): Unit = uniformMap.values.foreach(_.upload())
 
+  /**
+    * Ends the use of this program.
+    */
   def end(): Unit = OpenGlHelper.glUseProgram(0)
 }
 object MirrorShaderProgram {
 
-  def missingShaderProgram(shaders: Seq[MirrorShader], uniforms: Map[String, UniformBase[_ <: UniformType]]) =
+  private[mirror] def missingShaderProgram(shaders: Seq[MirrorShader], uniforms: Map[String, UniformBase[_ <: UniformType]]) =
     MirrorShaderProgram(shaders, 0, uniforms.map { case (name, base) => name -> new NOOPUniform(base.tpe, base.count) })
 
+  /**
+    * Creates a new shader program with no management. Java-API.
+    * @param shaders A map of where to find shaders, and the shaders themselves.
+    * @param uniforms A map of uniform names and a base which the uniforms will be built on.
+    * @param strictUniforms If the uniforms should be strict (missing uniform == exception).
+    */
   @throws[ShaderException]
   def create(
       shaders: util.Map[ResourceLocation, MirrorShader],
@@ -64,6 +96,12 @@ object MirrorShaderProgram {
       strictUniforms: Boolean
   ): MirrorShaderProgram = create(shaders.asScala.toMap, uniforms.asScala.toMap, strictUniforms)
 
+  /**
+    * Creates a new shader program with no management. Scala-API.
+    * @param shaders A map of where to find shaders, and the shaders themselves.
+    * @param uniforms A map of uniform names and a base which the uniforms will be built on.
+    * @param strictUniforms If the uniforms should be strict (missing uniform == exception).
+    */
   @throws[ShaderException]
   def create(
       shaders: Map[ResourceLocation, MirrorShader],
@@ -97,6 +135,12 @@ object MirrorShaderProgram {
     MirrorShaderProgram(shaders.values.toSeq, programId, uniformMap)
   }
 
+  /**
+    * Creates a shader with more type information around uniforms. This will allow using the dynamic uniform syntax.
+    * @param shaders A map of where to find shaders, and the shaders themselves.
+    * @param uniforms A HList of all the uniforms.
+    * @param strictUniforms If the uniforms should be strict (missing uniform == exception).
+    */
   @throws[ShaderException]
   def createTyped[Uniforms <: HList](
       shaders: Map[ResourceLocation, MirrorShader],

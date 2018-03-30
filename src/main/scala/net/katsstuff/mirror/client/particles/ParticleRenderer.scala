@@ -134,6 +134,9 @@ class ParticleRenderer {
     }
   }
 
+  /**
+    * Adds a new particle to render.
+    */
   def addParticle(particle: IMirrorParticle): Unit = {
     require(particle != null, "Null particle")
     particles += particle

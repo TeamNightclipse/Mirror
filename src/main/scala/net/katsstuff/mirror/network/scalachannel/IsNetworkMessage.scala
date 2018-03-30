@@ -22,8 +22,14 @@ package net.katsstuff.mirror.network.scalachannel
 
 import scala.annotation.implicitNotFound
 
+/**
+  * Proof that a packet has a client handler.
+  */
 @implicitNotFound("Could not prove that ${A} can be sent to the client")
 trait HasClientHandler[-A]
 
+/**
+  * Proof that a packet has a server handler.
+  */
 @implicitNotFound("Could not prove that ${A} can be sent to the server")
 trait HasServerHandler[-A]

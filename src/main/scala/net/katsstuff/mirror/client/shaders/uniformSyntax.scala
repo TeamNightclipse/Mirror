@@ -20,14 +20,15 @@
  */
 package net.katsstuff.mirror.client.shaders
 
-import scala.annotation.implicitNotFound
 import scala.language.dynamics
 
 import shapeless._
 import shapeless.tag._
-import shapeless.record._
 import org.lwjgl.util.vector.{Matrix2f, Matrix3f, Matrix4f}
 
+/**
+  * A class providing dynamic access to uniforms of a Shader program from Scala.
+  */
 class UniformSyntax[Uniforms <: HList](val typedProgram: MirrorShaderProgram.TypeLevelProgram[Uniforms])
     extends AnyVal
     with Dynamic {

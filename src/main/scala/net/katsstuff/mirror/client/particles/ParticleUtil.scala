@@ -35,6 +35,18 @@ object ParticleUtil {
   private val random  = new Random
   private var counter = 0
 
+  /**
+    * Spawns a glow particle on the client, accounting for client settings.
+    * @param world The world to render the particle in.
+    * @param pos The position to render the particle at.
+    * @param motion The motion to give to the particle.
+    * @param r The red color of the particle.
+    * @param g The green color of the particle.
+    * @param b The blue color of the particle.
+    * @param scale The scale of the particle.
+    * @param lifetime The lifetime of the particle.
+    * @param texture The texture of the particle.
+    */
   @SideOnly(Side.CLIENT)
   def spawnParticleGlow(
       world: World,
@@ -58,6 +70,19 @@ object ParticleUtil {
     }
   }
 
+  /**
+    * Sends a packet to render a glow particle centered around a location.
+    * @param world The world to render the particle in.
+    * @param pos The position to render the particle at.
+    * @param motion The motion to give to the particle.
+    * @param r The red color of the particle.
+    * @param g The green color of the particle.
+    * @param b The blue color of the particle.
+    * @param scale The scale of the particle.
+    * @param lifetime The lifetime of the particle.
+    * @param texture The texture of the particle.
+    * @param range The range to send the packet in.
+    */
   def spawnParticleGlowPacket(
       world: World,
       pos: Vector3,
