@@ -7,6 +7,7 @@ import javax.annotation.Nullable
 import scala.collection.JavaConverters._
 
 import net.katsstuff.mirror.Mirror
+import net.katsstuff.mirror.client.MirrorResourceHelper
 import net.katsstuff.mirror.client.helper.ResourceHelperS
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
@@ -20,7 +21,7 @@ import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 @SideOnly(Side.CLIENT) class BakedRender extends BakedPerspective {
   private var transforms = BakedPerspective.BlockTransforms
 
-  private var particle: ResourceLocation = ResourceHelperS.getAtlas(Mirror.Id, None, "null")
+  private var particle: ResourceLocation = MirrorResourceHelper.getAtlas(None, "null")
 
   override def applyFormat(format: VertexFormat): Baked = this
 
