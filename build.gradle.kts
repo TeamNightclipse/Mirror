@@ -112,6 +112,14 @@ tasks.withType<ProcessResources> {
     }
 }
 
+tasks.withType<Jar> {
+    shade.forEach { dep ->
+        from(project.zipTree(dep)) {
+            exclude("META-INF", "META-INF/**")
+        }
+    }
+}
+
 tasks {
     "incrementBuildNumber" {
         dependsOn("reobfJar")
