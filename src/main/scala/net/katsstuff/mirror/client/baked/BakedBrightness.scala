@@ -31,9 +31,9 @@ abstract class BakedBrightness extends BakedPerspective {
 
   override def getQuads(@Nullable state: IBlockState, @Nullable facing: EnumFacing, rand: Long): util.List[BakedQuad] =
     if (facing != null) Nil.asJava
-    else getQuads(state, if (state == null) DefaultVertexFormats.ITEM else format)
+    else getQuads(state)
 
-  def getQuads(@Nullable state: IBlockState, format: VertexFormat): util.List[BakedQuad]
+  def getQuads(@Nullable state: IBlockState): util.List[BakedQuad]
 
   override def isAmbientOcclusion = true
 
