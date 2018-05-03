@@ -5,8 +5,6 @@ import java.util
 import scala.annotation.varargs
 import scala.collection.JavaConverters._
 import scala.collection.mutable
-
-import net.katsstuff.mirror.client.ClientProxy
 import net.katsstuff.mirror.data.{Quat, Vector3}
 import net.minecraft.client.renderer.block.model.BakedQuad
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
@@ -114,12 +112,12 @@ class QuadBuilder private (
     import Vector3.WrappedVec3i
     facingMap.get(last) match {
       case Some(holder) => {
-        val quat = Quat.fromAxisAngle(last.getAxis, 180D)
-        val vec = WrappedVec3i(last.getDirectionVec).asImmutable.rotate(quat)
+        val quat   = Quat.fromAxisAngle(last.getAxis, 180D)
+        val vec    = WrappedVec3i(last.getDirectionVec).asImmutable.rotate(quat)
         val facing = EnumFacing.getFacingFromVector(vec.x.toFloat, vec.y.toFloat, vec.z.toFloat)
         copy(facingMap = facingMap.updated(facing, holder.rotate(quat)))
       }
-      case None         => this
+      case None => this
     }
   }
 
@@ -147,7 +145,7 @@ class QuadBuilder private (
     val newMap: mutable.Map[EnumFacing, QuadHolder] = mutable.Map()
     facingMap.foreach {
       case (k: EnumFacing, v: QuadHolder) =>
-        val vec = WrappedVec3i(k.getDirectionVec).asImmutable.rotate(quat)
+        val vec    = WrappedVec3i(k.getDirectionVec).asImmutable.rotate(quat)
         val facing = EnumFacing.getFacingFromVector(vec.x.toFloat, vec.y.toFloat, vec.z.toFloat)
         newMap += (facing -> v.rotate(quat))
     }
@@ -197,16 +195,15 @@ class QuadBuilder private (
         case COLOR =>
           builder.put(e, 1F, 1F, 1F, 1F)
         case UV =>
-          if (!ClientProxy.isOptifineInstalled && (format.getElement(e).getIndex == 1)) {
-            if (hasBrightness) builder.put(e, 1F, 1F) else builder.put(e, 0F, 0F)
+          if (format.getElement(e).getIndex == 1) {
+            if (hasBrightness) builder.put(e, (15F * 0x20) / 0xFFFF, (15F * 0x20) / 0xFFFF) else builder.put(e, 0F, 0F)
           } else if (format.getElement(e).getIndex == 0) {
             usedU = sprite.getInterpolatedU(usedU)
             usedV = sprite.getInterpolatedV(usedV)
             builder.put(e, usedU, usedV, 0F, 1F)
           }
         case NORMAL =>
-          if (!ClientProxy.isOptifineInstalled && hasBrightness) builder.put(e, 0F, 1F, 0F)
-          else builder.put(e, normal.x.toFloat, normal.y.toFloat, normal.z.toFloat, 0f)
+          builder.put(e, normal.x.toFloat, normal.y.toFloat, normal.z.toFloat, 0F)
         case _ =>
           builder.put(e)
       }
