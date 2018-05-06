@@ -23,6 +23,7 @@ package net.katsstuff.mirror.network.scalachannel
 import java.lang.ref.WeakReference
 import java.util
 
+import scala.annotation.tailrec
 import scala.collection.mutable
 import scala.reflect.ClassTag
 
@@ -49,12 +50,36 @@ class ScalaIndexedMessageChannel extends ChannelDuplexHandler {
   private val classToDiscriminator     = mutable.HashMap.empty[Class[_], Byte]
 
   private val encoder = new MessageToMessageEncoder[AnyRef]() {
-    override def acceptOutboundMessage(msg: AnyRef): Boolean = classToDiscriminator.contains(msg.getClass)
+
+    def getDiscriminator(msgClazz: Class[_]): Option[Byte] = {
+      if(msgClazz != null) {
+        val directParents = classToDiscriminator.get(msgClazz).orElse(getDiscriminator(msgClazz.getSuperclass))
+        directParents match {
+          case res @ Some(_) => res
+          case None =>
+            @tailrec
+            def checkInterfaces(interfaces: Array[Class[_]], idx: Int): Option[Byte] = {
+              if(interfaces.isDefinedAt(idx)) {
+                getDiscriminator(interfaces(idx)) match {
+                  case res @ Some(_) => res
+                  case None => checkInterfaces(interfaces, idx + 1)
+                }
+              } else None
+            }
+
+            checkInterfaces(msgClazz.getInterfaces, 0)
+        }
+
+      } else None
+    }
+
+    override def acceptOutboundMessage(msg: AnyRef): Boolean = getDiscriminator(msg.getClass).nonEmpty
+
     override def encode(ctx: ChannelHandlerContext, msg: AnyRef, out: util.List[AnyRef]): Unit = {
       val buf = new PacketBuffer(Unpooled.buffer)
 
       val packetData = for {
-        discriminator <- classToDiscriminator.get(msg.getClass)
+        discriminator <- getDiscriminator(msg.getClass)
         converter     <- discriminatorToConverter.get(discriminator)
       } yield (discriminator, converter)
 
