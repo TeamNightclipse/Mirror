@@ -115,22 +115,6 @@ tasks.withType<ProcessResources> {
     }
 }
 
-tasks {
-    "incrementBuildNumber" {
-        dependsOn("reobfJar")
-        doLast {
-            config["build_number"] = config["build_number"].toString().toInt() + 1
-            config.toProperties().store(configFile.writer(), "")
-        }
-    }
-}
-
-fun parseConfig(config: File): ConfigObject {
-    val prop = Properties()
-    prop.load(config.reader())
-    return ConfigSlurper().parse(prop)
-}
-
 idea.module.inheritOutputDirs = true
 
 val reobf: NamedDomainObjectContainer<IReobfuscator> by extensions
@@ -149,5 +133,21 @@ reobf {
 
 tasks.get("reobfShadowJar").mustRunAfter("shadowJar")
 tasks.get("build").dependsOn("reobfShadowJar")
+
+tasks {
+    "incrementBuildNumber" {
+        dependsOn("reobfShadowJar")
+        doLast {
+            config["build_number"] = config["build_number"].toString().toInt() + 1
+            config.toProperties().store(configFile.writer(), "")
+        }
+    }
+}
+
+fun parseConfig(config: File): ConfigObject {
+    val prop = Properties()
+    prop.load(config.reader())
+    return ConfigSlurper().parse(prop)
+}
 
 defaultTasks("clean", "build", "incrementBuildNumber")
