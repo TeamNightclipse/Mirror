@@ -61,77 +61,77 @@ sealed trait AbstractVector3 extends Any { self =>
   /**
 		* Create a new vector with this vector and the other vector added together.
 		*/
-  def +(other: AbstractVector3):   Self = this + (other.x, other.y, other.z)
+  def +(other: AbstractVector3): Self   = this + (other.x, other.y, other.z)
   def add(other: AbstractVector3): Self = this + other
 
   /**
 		* Create a new vector with the passed in value added to this vector
 		*/
-  def +(other: Double):   Self = this + (other, other, other)
+  def +(other: Double): Self   = this + (other, other, other)
   def add(other: Double): Self = this + other
 
   /**
 		* Create a new vector with the passed in values added to this vector
 		*/
-  def +(x: Double, y: Double, z: Double):   Self = create(this.x + x, this.y + y, this.z + z)
+  def +(x: Double, y: Double, z: Double): Self   = create(this.x + x, this.y + y, this.z + z)
   def add(x: Double, y: Double, z: Double): Self = this + (x, y, z)
 
   /**
 		* Create a new vector with the passed in vector subtracted from this vector
 		*/
-  def -(other: AbstractVector3):        Self = this - (other.x, other.y, other.z)
+  def -(other: AbstractVector3): Self        = this - (other.x, other.y, other.z)
   def subtract(other: AbstractVector3): Self = this - other
 
   /**
 		* Create a new vector with the passed in value subtracted from this vector
 		*/
-  def -(other: Double):        Self = this - (other, other, other)
+  def -(other: Double): Self        = this - (other, other, other)
   def subtract(other: Double): Self = this - other
 
   /**
 		* Create a new vector with the passed in values subtracted from this vector
 		*/
-  def -(x: Double, y: Double, z: Double):        Self = create(this.x - x, this.y - y, this.z - z)
+  def -(x: Double, y: Double, z: Double): Self        = create(this.x - x, this.y - y, this.z - z)
   def subtract(x: Double, y: Double, z: Double): Self = this - (x, y, z)
 
   /**
 		* Create a new vector with this vector and the other vector multiplied together.
 		*/
-  def *(other: AbstractVector3):        Self = this * (other.x, other.y, other.z)
+  def *(other: AbstractVector3): Self        = this * (other.x, other.y, other.z)
   def multiply(other: AbstractVector3): Self = this * other
 
   /**
 		* Create a new vector with the passed in value multiplied with this vector
 		*/
-  def *(other: Double):        Self = this * (other, other, other)
+  def *(other: Double): Self        = this * (other, other, other)
   def multiply(other: Double): Self = this * other
 
   /**
 		* Create a new vector with the passed in values multiplied with this vector
 		*/
-  def *(x: Double, y: Double, z: Double):        Self = create(this.x * x, this.y * y, this.z * z)
+  def *(x: Double, y: Double, z: Double): Self        = create(this.x * x, this.y * y, this.z * z)
   def multiply(x: Double, y: Double, z: Double): Self = this * (x, y, z)
 
   /**
 		* Create a new vector with the passed in vector divided by this vector
 		*/
-  def /(other: AbstractVector3):      Self = this / (other.x, other.y, other.z)
+  def /(other: AbstractVector3): Self      = this / (other.x, other.y, other.z)
   def divide(other: AbstractVector3): Self = this / other
 
   /**
 		* Create a new vector with the passed in value divided by this vector
 		*/
-  def /(other: Double):      Self = /(other, other, other)
+  def /(other: Double): Self      = /(other, other, other)
   def divide(other: Double): Self = this./(other)
 
   /**
 		* Create a new vector with the passed in values divided by this vector
 		*/
-  def /(x: Double, y: Double, z: Double):      Self = create(this.x / x, this.y / y, this.z / z)
+  def /(x: Double, y: Double, z: Double): Self      = create(this.x / x, this.y / y, this.z / z)
   def divide(x: Double, y: Double, z: Double): Self = this / (x, y, z)
 
   def unary_- : Self = create(-x, -y, -z)
-  def negate:   Self = unary_-
+  def negate: Self   = unary_-
 
   /**
 		* Create a new vector that is normalized.
@@ -336,13 +336,13 @@ final case class MutableVector3(@BeanProperty var x: Double, @BeanProperty var y
   /**
 		* Adds the passed in vector to this vector.
 		*/
-  def +=(other: AbstractVector3):         this.type = +=(other.x, other.y, other.z)
+  def +=(other: AbstractVector3): this.type         = +=(other.x, other.y, other.z)
   def addMutable(other: AbstractVector3): this.type = this.+=(other)
 
   /**
 		* Adds the passed in value to this vector.
 		*/
-  def +=(other: Double):         this.type = +=(other, other, other)
+  def +=(other: Double): this.type         = +=(other, other, other)
   def addMutable(other: Double): this.type = this.+=(other)
 
   /**
@@ -359,13 +359,13 @@ final case class MutableVector3(@BeanProperty var x: Double, @BeanProperty var y
   /**
 		* Subtracts the passed in vector from this vector.
 		*/
-  def -=(other: AbstractVector3):              this.type = -=(other.x, other.y, other.z)
+  def -=(other: AbstractVector3): this.type              = -=(other.x, other.y, other.z)
   def subtractMutable(other: AbstractVector3): this.type = this.-=(other)
 
   /**
 		* Subtracts the passed in value from this vector.
 		*/
-  def -=(other: Double):              this.type = -=(other, other, other)
+  def -=(other: Double): this.type              = -=(other, other, other)
   def subtractMutable(other: Double): this.type = this.-=(other)
 
   /**
@@ -382,13 +382,13 @@ final case class MutableVector3(@BeanProperty var x: Double, @BeanProperty var y
   /**
 		* Multiplies this vector with the passed in vector.
 		*/
-  def *=(other: AbstractVector3):              this.type = *=(other.x, other.y, other.z)
+  def *=(other: AbstractVector3): this.type              = *=(other.x, other.y, other.z)
   def multiplyMutable(other: AbstractVector3): this.type = this.*=(other)
 
   /**
 		* Multiplies this vector with the passed in value.
 		*/
-  def *=(other: Double):              this.type = *=(other, other, other)
+  def *=(other: Double): this.type              = *=(other, other, other)
   def multiplyMutable(other: Double): this.type = this.*=(other)
 
   /**
@@ -405,13 +405,13 @@ final case class MutableVector3(@BeanProperty var x: Double, @BeanProperty var y
   /**
 		* Divides this vector with the passed in vector.
 		*/
-  def /=(other: AbstractVector3):            this.type = /=(other.x, other.y, other.z)
+  def /=(other: AbstractVector3): this.type            = /=(other.x, other.y, other.z)
   def divideMutable(other: AbstractVector3): this.type = this./=(other)
 
   /**
 		* Divides this vector with the passed in value.
 		*/
-  def /=(other: Double):            this.type = /=(other, other, other)
+  def /=(other: Double): this.type            = /=(other, other, other)
   def divideMutable(other: Double): this.type = this./=(other)
 
   /**
@@ -463,36 +463,36 @@ final case class MutableVector3(@BeanProperty var x: Double, @BeanProperty var y
 
   //These methods beyond this only call super, but don't have dependent type so they are java friendly
 
-  override def add(other: AbstractVector3):          MutableVector3 = super.add(other)
-  override def add(other: Double):                   MutableVector3 = super.add(other)
+  override def add(other: AbstractVector3): MutableVector3          = super.add(other)
+  override def add(other: Double): MutableVector3                   = super.add(other)
   override def add(x: Double, y: Double, z: Double): MutableVector3 = super.add(x, y, z)
 
-  override def subtract(other: AbstractVector3):          MutableVector3 = super.subtract(other)
-  override def subtract(other: Double):                   MutableVector3 = super.subtract(other)
+  override def subtract(other: AbstractVector3): MutableVector3          = super.subtract(other)
+  override def subtract(other: Double): MutableVector3                   = super.subtract(other)
   override def subtract(x: Double, y: Double, z: Double): MutableVector3 = super.subtract(x, y, z)
 
-  override def multiply(other: AbstractVector3):          MutableVector3 = super.multiply(other)
-  override def multiply(other: Double):                   MutableVector3 = super.multiply(other)
+  override def multiply(other: AbstractVector3): MutableVector3          = super.multiply(other)
+  override def multiply(other: Double): MutableVector3                   = super.multiply(other)
   override def multiply(x: Double, y: Double, z: Double): MutableVector3 = super.multiply(x, y, z)
 
-  override def divide(other: AbstractVector3):          MutableVector3 = super.divide(other)
-  override def divide(other: Double):                   MutableVector3 = super.divide(other)
+  override def divide(other: AbstractVector3): MutableVector3          = super.divide(other)
+  override def divide(other: Double): MutableVector3                   = super.divide(other)
   override def divide(x: Double, y: Double, z: Double): MutableVector3 = super.divide(x, y, z)
 
-  override def negate:    MutableVector3 = unary_-
+  override def negate: MutableVector3    = unary_-
   override def normalize: MutableVector3 = super.normalize
 
-  override def cross(other: AbstractVector3):          MutableVector3 = super.cross(other)
+  override def cross(other: AbstractVector3): MutableVector3          = super.cross(other)
   override def cross(x: Double, y: Double, z: Double): MutableVector3 = super.cross(x, y, z)
 
   override def offset(direction: AbstractVector3, distance: Double): MutableVector3 = super.offset(direction, distance)
 
-  override def rotate(quat: Quat):                              MutableVector3 = super.rotate(quat)
-  override def rotate(angle: Double, axis: EnumFacing.Axis):    MutableVector3 = super.rotate(angle, axis)
-  override def rotate(angle: Double, axis: AbstractVector3):    MutableVector3 = super.rotate(angle, axis)
+  override def rotate(quat: Quat): MutableVector3                              = super.rotate(quat)
+  override def rotate(angle: Double, axis: EnumFacing.Axis): MutableVector3    = super.rotate(angle, axis)
+  override def rotate(angle: Double, axis: AbstractVector3): MutableVector3    = super.rotate(angle, axis)
   override def rotateRad(angle: Double, axis: AbstractVector3): MutableVector3 = super.rotateRad(angle, axis)
-  override def lerp(target: AbstractVector3, alpha: Double):    MutableVector3 = super.lerp(target, alpha)
-  override def slerp(target: AbstractVector3, alpha: Double):   MutableVector3 = super.slerp(target, alpha)
+  override def lerp(target: AbstractVector3, alpha: Double): MutableVector3    = super.lerp(target, alpha)
+  override def slerp(target: AbstractVector3, alpha: Double): MutableVector3   = super.slerp(target, alpha)
 
   override def transformDirection(mat: AbstractMat4): MutableVector3 = super.transformDirection(mat)
 }
@@ -519,10 +519,10 @@ final case class Vector3(@BeanProperty x: Double, @BeanProperty y: Double, @Bean
 
   def create(x: Double, y: Double, z: Double): Vector3 = Vector3(x, y, z)
 
-  override lazy val length:    Double  = super.length
+  override lazy val length: Double     = super.length
   override lazy val normalize: Vector3 = super.normalize
-  override lazy val yawRad:    Double  = super.yawRad
-  override lazy val pitchRad:  Double  = super.pitchRad
+  override lazy val yawRad: Double     = super.yawRad
+  override lazy val pitchRad: Double   = super.pitchRad
 
   override def asMutable: MutableVector3 = MutableVector3(x, y, z)
 
@@ -530,35 +530,35 @@ final case class Vector3(@BeanProperty x: Double, @BeanProperty y: Double, @Bean
 
   //These methods beyond this only call super, but don't have dependent type so they are java friendly
 
-  override def add(other: AbstractVector3):          Vector3 = super.add(other)
-  override def add(other: Double):                   Vector3 = super.add(other)
+  override def add(other: AbstractVector3): Vector3          = super.add(other)
+  override def add(other: Double): Vector3                   = super.add(other)
   override def add(x: Double, y: Double, z: Double): Vector3 = super.add(x, y, z)
 
-  override def subtract(other: AbstractVector3):          Vector3 = super.subtract(other)
-  override def subtract(other: Double):                   Vector3 = super.subtract(other)
+  override def subtract(other: AbstractVector3): Vector3          = super.subtract(other)
+  override def subtract(other: Double): Vector3                   = super.subtract(other)
   override def subtract(x: Double, y: Double, z: Double): Vector3 = super.subtract(x, y, z)
 
-  override def multiply(other: AbstractVector3):          Vector3 = super.multiply(other)
-  override def multiply(other: Double):                   Vector3 = super.multiply(other)
+  override def multiply(other: AbstractVector3): Vector3          = super.multiply(other)
+  override def multiply(other: Double): Vector3                   = super.multiply(other)
   override def multiply(x: Double, y: Double, z: Double): Vector3 = super.multiply(x, y, z)
 
-  override def divide(other: AbstractVector3):          Vector3 = super.divide(other)
-  override def divide(other: Double):                   Vector3 = super.divide(other)
+  override def divide(other: AbstractVector3): Vector3          = super.divide(other)
+  override def divide(other: Double): Vector3                   = super.divide(other)
   override def divide(x: Double, y: Double, z: Double): Vector3 = super.divide(x, y, z)
 
   override def negate: Vector3 = unary_-
 
-  override def cross(other: AbstractVector3):          Vector3 = super.cross(other)
+  override def cross(other: AbstractVector3): Vector3          = super.cross(other)
   override def cross(x: Double, y: Double, z: Double): Vector3 = super.cross(x, y, z)
 
   override def offset(direction: AbstractVector3, distance: Double): Vector3 = super.offset(direction, distance)
 
-  override def rotate(quat: Quat):                              Vector3 = super.rotate(quat)
-  override def rotate(angle: Double, axis: EnumFacing.Axis):    Vector3 = super.rotate(angle, axis)
-  override def rotate(angle: Double, axis: AbstractVector3):    Vector3 = super.rotate(angle, axis)
+  override def rotate(quat: Quat): Vector3                              = super.rotate(quat)
+  override def rotate(angle: Double, axis: EnumFacing.Axis): Vector3    = super.rotate(angle, axis)
+  override def rotate(angle: Double, axis: AbstractVector3): Vector3    = super.rotate(angle, axis)
   override def rotateRad(angle: Double, axis: AbstractVector3): Vector3 = super.rotateRad(angle, axis)
 
-  override def lerp(target: AbstractVector3, alpha: Double):  Vector3 = super.lerp(target, alpha)
+  override def lerp(target: AbstractVector3, alpha: Double): Vector3  = super.lerp(target, alpha)
   override def slerp(target: AbstractVector3, alpha: Double): Vector3 = super.slerp(target, alpha)
 
   override def transformDirection(mat: AbstractMat4): Vector3 = super.transformDirection(mat)
@@ -663,39 +663,39 @@ object Vector3 {
     override def y: Double = toVec3d.y
     override def z: Double = toVec3d.z
 
-    override def create(x: Double, y: Double, z: Double): WrappedVec3d   = new Vec3d(x, y, z)
-    override def asMutable:                               MutableVector3 = MutableVector3(x, y, z)
-    override def asImmutable:                             Vector3        = Vector3(x, y, z)
+    override def create(x: Double, y: Double, z: Double): WrappedVec3d = new Vec3d(x, y, z)
+    override def asMutable: MutableVector3                             = MutableVector3(x, y, z)
+    override def asImmutable: Vector3                                  = Vector3(x, y, z)
 
     //These methods beyond this only call super, but don't have dependent type so they are java friendly
 
-    override def add(other: AbstractVector3):          WrappedVec3d = super.add(other)
-    override def add(other: Double):                   WrappedVec3d = super.add(other)
+    override def add(other: AbstractVector3): WrappedVec3d          = super.add(other)
+    override def add(other: Double): WrappedVec3d                   = super.add(other)
     override def add(x: Double, y: Double, z: Double): WrappedVec3d = super.add(x, y, z)
 
-    override def subtract(other: AbstractVector3):          WrappedVec3d = super.subtract(other)
-    override def subtract(other: Double):                   WrappedVec3d = super.subtract(other)
+    override def subtract(other: AbstractVector3): WrappedVec3d          = super.subtract(other)
+    override def subtract(other: Double): WrappedVec3d                   = super.subtract(other)
     override def subtract(x: Double, y: Double, z: Double): WrappedVec3d = super.subtract(x, y, z)
 
-    override def multiply(other: AbstractVector3):          WrappedVec3d = super.multiply(other)
-    override def multiply(other: Double):                   WrappedVec3d = super.multiply(other)
+    override def multiply(other: AbstractVector3): WrappedVec3d          = super.multiply(other)
+    override def multiply(other: Double): WrappedVec3d                   = super.multiply(other)
     override def multiply(x: Double, y: Double, z: Double): WrappedVec3d = super.multiply(x, y, z)
 
-    override def divide(other: AbstractVector3):          WrappedVec3d = super.divide(other)
-    override def divide(other: Double):                   WrappedVec3d = super.divide(other)
+    override def divide(other: AbstractVector3): WrappedVec3d          = super.divide(other)
+    override def divide(other: Double): WrappedVec3d                   = super.divide(other)
     override def divide(x: Double, y: Double, z: Double): WrappedVec3d = super.divide(x, y, z)
 
-    override def negate:    WrappedVec3d = unary_-
+    override def negate: WrappedVec3d    = unary_-
     override def normalize: WrappedVec3d = super.normalize
 
-    override def cross(other: AbstractVector3):          WrappedVec3d = super.cross(other)
+    override def cross(other: AbstractVector3): WrappedVec3d          = super.cross(other)
     override def cross(x: Double, y: Double, z: Double): WrappedVec3d = super.cross(x, y, z)
 
     override def offset(direction: AbstractVector3, distance: Double): WrappedVec3d = super.offset(direction, distance)
 
-    override def rotate(quat: Quat):                              WrappedVec3d = super.rotate(quat)
-    override def rotate(angle: Double, axis: EnumFacing.Axis):    WrappedVec3d = super.rotate(angle, axis)
-    override def rotate(angle: Double, axis: AbstractVector3):    WrappedVec3d = super.rotate(angle, axis)
+    override def rotate(quat: Quat): WrappedVec3d                              = super.rotate(quat)
+    override def rotate(angle: Double, axis: EnumFacing.Axis): WrappedVec3d    = super.rotate(angle, axis)
+    override def rotate(angle: Double, axis: AbstractVector3): WrappedVec3d    = super.rotate(angle, axis)
     override def rotateRad(angle: Double, axis: AbstractVector3): WrappedVec3d = super.rotateRad(angle, axis)
   }
 
@@ -707,39 +707,39 @@ object Vector3 {
     override def y: Double = toVec3i.getY
     override def z: Double = toVec3i.getZ
 
-    override def create(x: Double, y: Double, z: Double): WrappedVec3i   = new Vec3i(x, y, z)
-    override def asMutable:                               MutableVector3 = MutableVector3(x, y, z)
-    override def asImmutable:                             Vector3        = Vector3(x, y, z)
+    override def create(x: Double, y: Double, z: Double): WrappedVec3i = new Vec3i(x, y, z)
+    override def asMutable: MutableVector3                             = MutableVector3(x, y, z)
+    override def asImmutable: Vector3                                  = Vector3(x, y, z)
 
     //These methods beyond this only call super, but don't have dependent type so they are java friendly
 
-    override def add(other: AbstractVector3):          WrappedVec3i = super.add(other)
-    override def add(other: Double):                   WrappedVec3i = super.add(other)
+    override def add(other: AbstractVector3): WrappedVec3i          = super.add(other)
+    override def add(other: Double): WrappedVec3i                   = super.add(other)
     override def add(x: Double, y: Double, z: Double): WrappedVec3i = super.add(x, y, z)
 
-    override def subtract(other: AbstractVector3):          WrappedVec3i = super.subtract(other)
-    override def subtract(other: Double):                   WrappedVec3i = super.subtract(other)
+    override def subtract(other: AbstractVector3): WrappedVec3i          = super.subtract(other)
+    override def subtract(other: Double): WrappedVec3i                   = super.subtract(other)
     override def subtract(x: Double, y: Double, z: Double): WrappedVec3i = super.subtract(x, y, z)
 
-    override def multiply(other: AbstractVector3):          WrappedVec3i = super.multiply(other)
-    override def multiply(other: Double):                   WrappedVec3i = super.multiply(other)
+    override def multiply(other: AbstractVector3): WrappedVec3i          = super.multiply(other)
+    override def multiply(other: Double): WrappedVec3i                   = super.multiply(other)
     override def multiply(x: Double, y: Double, z: Double): WrappedVec3i = super.multiply(x, y, z)
 
-    override def divide(other: AbstractVector3):          WrappedVec3i = super.divide(other)
-    override def divide(other: Double):                   WrappedVec3i = super.divide(other)
+    override def divide(other: AbstractVector3): WrappedVec3i          = super.divide(other)
+    override def divide(other: Double): WrappedVec3i                   = super.divide(other)
     override def divide(x: Double, y: Double, z: Double): WrappedVec3i = super.divide(x, y, z)
 
-    override def negate:    WrappedVec3i = unary_-
+    override def negate: WrappedVec3i    = unary_-
     override def normalize: WrappedVec3i = super.normalize
 
-    override def cross(other: AbstractVector3):          WrappedVec3i = super.cross(other)
+    override def cross(other: AbstractVector3): WrappedVec3i          = super.cross(other)
     override def cross(x: Double, y: Double, z: Double): WrappedVec3i = super.cross(x, y, z)
 
     override def offset(direction: AbstractVector3, distance: Double): WrappedVec3i = super.offset(direction, distance)
 
-    override def rotate(quat: Quat):                              WrappedVec3i = super.rotate(quat)
-    override def rotate(angle: Double, axis: EnumFacing.Axis):    WrappedVec3i = super.rotate(angle, axis)
-    override def rotate(angle: Double, axis: AbstractVector3):    WrappedVec3i = super.rotate(angle, axis)
+    override def rotate(quat: Quat): WrappedVec3i                              = super.rotate(quat)
+    override def rotate(angle: Double, axis: EnumFacing.Axis): WrappedVec3i    = super.rotate(angle, axis)
+    override def rotate(angle: Double, axis: AbstractVector3): WrappedVec3i    = super.rotate(angle, axis)
     override def rotateRad(angle: Double, axis: AbstractVector3): WrappedVec3i = super.rotateRad(angle, axis)
   }
 

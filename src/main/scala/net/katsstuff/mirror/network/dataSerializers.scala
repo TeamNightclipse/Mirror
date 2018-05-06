@@ -37,8 +37,8 @@ class OptionSerializers[A](serializer: DataSerializer[A]) extends DataSerializer
       Some(serializer.read(buf))
     } else None
 
-  override def createKey(id: Int):          DataParameter[Option[A]] = new DataParameter(id, this)
-  override def copyValue(value: Option[A]): Option[A]                = value.map(serializer.copyValue)
+  override def createKey(id: Int): DataParameter[Option[A]] = new DataParameter(id, this)
+  override def copyValue(value: Option[A]): Option[A]       = value.map(serializer.copyValue)
 }
 
 class SeqSerializer[A](serializer: DataSerializer[A]) extends DataSerializer[Seq[A]] {
@@ -52,8 +52,8 @@ class SeqSerializer[A](serializer: DataSerializer[A]) extends DataSerializer[Seq
     for (_ <- 0 until size) yield serializer.read(buf)
   }
 
-  override def createKey(id: Int):       DataParameter[Seq[A]] = new DataParameter(id, this)
-  override def copyValue(value: Seq[A]): Seq[A]                = value.map(serializer.copyValue)
+  override def createKey(id: Int): DataParameter[Seq[A]] = new DataParameter(id, this)
+  override def copyValue(value: Seq[A]): Seq[A]          = value.map(serializer.copyValue)
 }
 
 object Vector3Serializer extends DataSerializer[Vector3] {
@@ -62,14 +62,14 @@ object Vector3Serializer extends DataSerializer[Vector3] {
     buf.writeDouble(value.y)
     buf.writeDouble(value.z)
   }
-  override def read(buf: PacketBuffer):   Vector3                = Vector3(buf.readDouble(), buf.readDouble(), buf.readDouble())
-  override def createKey(id: Int):        DataParameter[Vector3] = new DataParameter(id, this)
-  override def copyValue(value: Vector3): Vector3                = value
+  override def read(buf: PacketBuffer): Vector3           = Vector3(buf.readDouble(), buf.readDouble(), buf.readDouble())
+  override def createKey(id: Int): DataParameter[Vector3] = new DataParameter(id, this)
+  override def copyValue(value: Vector3): Vector3         = value
 }
 
 class EnumSerializer[T <: Enum[T]](val enumClass: Class[T]) extends DataSerializer[T] {
   override def write(buf: PacketBuffer, value: T): Unit = buf.writeEnumValue(value)
-  override def read(buf: PacketBuffer):            T    = buf.readEnumValue(enumClass)
-  override def createKey(id: Int) = new DataParameter[T](id, this)
-  override def copyValue(value: T): T = value
+  override def read(buf: PacketBuffer): T               = buf.readEnumValue(enumClass)
+  override def createKey(id: Int)                       = new DataParameter[T](id, this)
+  override def copyValue(value: T): T                   = value
 }

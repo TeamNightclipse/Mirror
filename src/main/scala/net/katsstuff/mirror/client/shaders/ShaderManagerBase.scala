@@ -228,10 +228,11 @@ class ShaderManagerBase(resourceManager: IResourceManager) extends IResourceMana
       toMap: ops.record.ToMap.Aux[Uniforms, Keys, Values]
   ): ShaderProgramKey[mapCreateKey.Out] = {
     shaderProgramsInits.addBinding(shaderLocation, init)
-    val key = ShaderProgramKey(shaderLocation, uniforms)
+    val key        = ShaderProgramKey(shaderLocation, uniforms)
     val uniformMap = toMap(uniforms)
-    val lubedUniforms = uniformMap.map { case (k, v) =>
-      (k: String) -> (v: UniformBase[_ <: UniformType])
+    val lubedUniforms = uniformMap.map {
+      case (k, v) =>
+        (k: String) -> (v: UniformBase[_ <: UniformType])
     }
     init(getOrElseAddProgram(key, shaderTypes, lubedUniforms, strictUniforms = true))
     key

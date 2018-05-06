@@ -29,7 +29,7 @@ import net.minecraft.client.renderer.OpenGlHelper
   */
 sealed abstract case class ShaderType(constant: Int, extension: String)
 object ShaderType {
-  object Vertex   extends ShaderType(OpenGlHelper.GL_VERTEX_SHADER, "vsh")
+  object Vertex extends ShaderType(OpenGlHelper.GL_VERTEX_SHADER, "vsh")
   def vertex: Vertex.type = Vertex
 
   object Fragment extends ShaderType(OpenGlHelper.GL_FRAGMENT_SHADER, "fsh")

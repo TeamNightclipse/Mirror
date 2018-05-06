@@ -85,12 +85,23 @@ sealed trait AbstractMat4 { self =>
   }
 }
 final case class MutableMat4(
-    var m00: Double, var m01: Double, var m02: Double, var m03: Double,
-    var m10: Double, var m11: Double, var m12: Double, var m13: Double,
-    var m20: Double, var m21: Double, var m22: Double, var m23: Double,
-    var m30: Double, var m31: Double, var m32: Double, var m33: Double
+    var m00: Double,
+    var m01: Double,
+    var m02: Double,
+    var m03: Double,
+    var m10: Double,
+    var m11: Double,
+    var m12: Double,
+    var m13: Double,
+    var m20: Double,
+    var m21: Double,
+    var m22: Double,
+    var m23: Double,
+    var m30: Double,
+    var m31: Double,
+    var m32: Double,
+    var m33: Double
 ) extends AbstractMat4 {
-
 
   override type Self = MutableMat4
 
@@ -129,9 +140,9 @@ final case class MutableMat4(
 
   def multiplyScalarMutable(scalar: Double): Unit = this *= scalar
 
-  override def transpose:                      MutableMat4 = super.transpose
+  override def transpose: MutableMat4                      = super.transpose
   override def multiplyScalar(scalar: Double): MutableMat4 = super.multiplyScalar(scalar)
-  def copyObj:                                 MutableMat4 = copy()
+  def copyObj: MutableMat4                                 = copy()
 }
 
 // format: OFF
@@ -145,28 +156,49 @@ final case class Mat4(
   override type Self = Mat4
 
   override def create(
-      m00: Double, m01: Double, m02: Double, m03: Double,
-      m10: Double, m11: Double, m12: Double, m13: Double,
-      m20: Double, m21: Double, m22: Double, m23: Double,
-      m30: Double, m31: Double, m32: Double, m33: Double
+      m00: Double,
+      m01: Double,
+      m02: Double,
+      m03: Double,
+      m10: Double,
+      m11: Double,
+      m12: Double,
+      m13: Double,
+      m20: Double,
+      m21: Double,
+      m22: Double,
+      m23: Double,
+      m30: Double,
+      m31: Double,
+      m32: Double,
+      m33: Double
   ): Self = Mat4(
-    m00, m01, m02, m03,
-    m10, m11, m12, m13,
-    m20, m21, m22, m23,
-    m30, m31, m32, m33
+    m00,
+    m01,
+    m02,
+    m03,
+    m10,
+    m11,
+    m12,
+    m13,
+    m20,
+    m21,
+    m22,
+    m23,
+    m30,
+    m31,
+    m32,
+    m33
   )
 
-  override def transpose:                      Mat4 = super.transpose
+  override def transpose: Mat4                      = super.transpose
   override def multiplyScalar(scalar: Double): Mat4 = super.multiplyScalar(scalar)
 }
 object Mat4 {
 
   // format: ON
   val Identity = Mat4(
-    1, 0, 0, 0,
-    0, 1, 0, 0,
-    0, 0, 1, 0,
-    0, 0, 0, 1
+    1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1
   )
   // format: OFF
 

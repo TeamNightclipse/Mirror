@@ -31,7 +31,7 @@ import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.MathHelper
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
-abstract sealed class AbstractQuat { self =>
+sealed abstract class AbstractQuat { self =>
 
   /**
 		* The type of this quat
@@ -66,25 +66,25 @@ abstract sealed class AbstractQuat { self =>
   /**
 		* Create a new quat with this quat and the other quat added together.
 		*/
-  def +(other: AbstractQuat):   Self = this + (other.x, other.y, other.z, other.w)
+  def +(other: AbstractQuat): Self   = this + (other.x, other.y, other.z, other.w)
   def add(other: AbstractQuat): Self = this + other
 
   /**
 		* Create a new quat with the passed in values added to this quat
 		*/
-  def +(x: Double, y: Double, z: Double, w: Double):   Self = create(this.x + x, this.y + y, this.z + z, this.w + w)
+  def +(x: Double, y: Double, z: Double, w: Double): Self   = create(this.x + x, this.y + y, this.z + z, this.w + w)
   def add(x: Double, y: Double, z: Double, w: Double): Self = this + (x, y, z, w)
 
   /**
 		* Create a new quat with this quat and the other quat multiplied together.
 		*/
-  def *(other: AbstractQuat):        Self = this * (other.x, other.y, other.z, other.w)
+  def *(other: AbstractQuat): Self        = this * (other.x, other.y, other.z, other.w)
   def multiply(other: AbstractQuat): Self = this * other
 
   /**
 		* Create a new quat with the passed in value multiplied with this quat
 		*/
-  def *(other: Double):        Self = create(x * other, y * other, z * other, w * other)
+  def *(other: Double): Self        = create(x * other, y * other, z * other, w * other)
   def multiply(other: Double): Self = this * other
 
   /**
@@ -324,7 +324,7 @@ final case class MutableQuat(
   /**
 		* Create a new quat with this quat and the other quat added together.
 		*/
-  def +=(other: AbstractQuat):         this.type = +=(other.x, other.y, other.z, other.w)
+  def +=(other: AbstractQuat): this.type         = +=(other.x, other.y, other.z, other.w)
   def addMutable(other: AbstractQuat): this.type = this.+=(other)
 
   /**
@@ -342,7 +342,7 @@ final case class MutableQuat(
   /**
 		* Create a new quat with this quat and the other quat multiplied together.
 		*/
-  def *=(other: AbstractQuat):              this.type = *=(other.x, other.y, other.z, other.w)
+  def *=(other: AbstractQuat): this.type              = *=(other.x, other.y, other.z, other.w)
   def multiplyMutable(other: AbstractQuat): this.type = this.*=(other)
 
   /**
@@ -418,14 +418,14 @@ final case class MutableQuat(
 
   //Beyond this is just methods that call super, but with defined Type so that Java likes them
 
-  override def add(other: AbstractQuat):                        MutableQuat = super.add(other)
+  override def add(other: AbstractQuat): MutableQuat                        = super.add(other)
   override def add(x: Double, y: Double, z: Double, w: Double): MutableQuat = super.add(x, y, z, w)
 
-  override def multiply(other: AbstractQuat):                        MutableQuat = super.multiply(other)
-  override def multiply(other: Double):                              MutableQuat = super.multiply(other)
+  override def multiply(other: AbstractQuat): MutableQuat                        = super.multiply(other)
+  override def multiply(other: Double): MutableQuat                              = super.multiply(other)
   override def multiply(x: Double, y: Double, z: Double, w: Double): MutableQuat = super.multiply(x, y, z, w)
 
-  override def mulLeft(other: AbstractQuat):                        MutableQuat = super.mulLeft(other)
+  override def mulLeft(other: AbstractQuat): MutableQuat                        = super.mulLeft(other)
   override def mulLeft(x: Double, y: Double, z: Double, w: Double): MutableQuat = super.mulLeft(x, y, z, w)
 }
 object MutableQuat {
@@ -498,9 +498,15 @@ object MutableQuat {
 
   //https://github.com/libgdx/libgdx/blob/master/gdx/src/com/badlogic/gdx/math/Quaternion.java#L496
   def fromAxes(
-      xx: Double, xy: Double, xz: Double,
-      yx: Double, yy: Double, yz: Double,
-      zx: Double, zy: Double, zz: Double
+      xx: Double,
+      xy: Double,
+      xz: Double,
+      yx: Double,
+      yy: Double,
+      yz: Double,
+      zx: Double,
+      zy: Double,
+      zz: Double
   ): MutableQuat = {
     val t = xx + yy + zz
 
@@ -557,18 +563,18 @@ final case class Quat(
 
   //We make conjugate a lazy val to prevent recomputing it
   override lazy val conjugate: Quat = super.conjugate
-  override def asImmutable:    Quat = this
+  override def asImmutable: Quat    = this
 
   override def asMutable: MutableQuat = MutableQuat(x, y, z, w)
 
-  override def add(other: AbstractQuat):                        Quat = super.add(other)
+  override def add(other: AbstractQuat): Quat                        = super.add(other)
   override def add(x: Double, y: Double, z: Double, w: Double): Quat = super.add(x, y, z, w)
 
-  override def multiply(other: AbstractQuat):                        Quat = super.multiply(other)
-  override def multiply(other: Double):                              Quat = super.multiply(other)
+  override def multiply(other: AbstractQuat): Quat                        = super.multiply(other)
+  override def multiply(other: Double): Quat                              = super.multiply(other)
   override def multiply(x: Double, y: Double, z: Double, w: Double): Quat = super.multiply(x, y, z, w)
 
-  override def mulLeft(other: AbstractQuat):                        Quat = super.mulLeft(other)
+  override def mulLeft(other: AbstractQuat): Quat                        = super.mulLeft(other)
   override def mulLeft(x: Double, y: Double, z: Double, w: Double): Quat = super.mulLeft(x, y, z, w)
 }
 

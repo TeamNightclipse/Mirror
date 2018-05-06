@@ -43,10 +43,10 @@ private[mirror] object MirrorLogHelper {
   def debug(obj: Any): Unit = log(Level.DEBUG, obj)
   def error(obj: Any): Unit = log(Level.ERROR, obj)
   def fatal(obj: Any): Unit = log(Level.FATAL, obj)
-  def info(obj: Any):  Unit = log(Level.INFO, obj)
+  def info(obj: Any): Unit  = log(Level.INFO, obj)
   def trace(obj: Any): Unit = log(Level.TRACE, obj)
-  def warn(obj: Any):  Unit = log(Level.WARN, obj)
+  def warn(obj: Any): Unit  = log(Level.WARN, obj)
 
   def error(obj: Any, e: Throwable): Unit = log(Level.ERROR, e, obj)
-  def warn(obj: Any, e: Throwable):  Unit = log(Level.WARN, e, obj)
+  def warn(obj: Any, e: Throwable): Unit  = log(Level.WARN, e, obj)
 }

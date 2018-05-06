@@ -35,7 +35,7 @@ class Vec3Suite extends FunSuite with Matchers with GeneratorDrivenPropertyCheck
   final val Epsilon = 1E5
 
   implicit val doubleEquality: Equality[Double] = TolerantNumerics.tolerantDoubleEquality(1E-5)
-  implicit val floatEquality:  Equality[Float]  = TolerantNumerics.tolerantFloatEquality(1E-2.toFloat)
+  implicit val floatEquality: Equality[Float]   = TolerantNumerics.tolerantFloatEquality(1E-2.toFloat)
 
   val saneDouble: Gen[Double] = Gen.choose(-Epsilon, Epsilon)
   val angleFloat: Gen[Float]  = Gen.choose(0F, 360F)

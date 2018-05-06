@@ -22,7 +22,7 @@ abstract class BakedBrightness extends BakedPerspective {
   var format: VertexFormat = _
 
   override def applyFormat(format: VertexFormat): Baked = {
-    if(!ClientProxy.isOptifineInstalled) {
+    if (!ClientProxy.isOptifineInstalled) {
       this.format = new VertexFormat(format)
       this.format.addElement(DefaultVertexFormats.TEX_2S)
     } else this.format = format

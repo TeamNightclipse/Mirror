@@ -149,7 +149,7 @@ object KeyCondition {
     * A condition which is always true.
     */
   case object Nothing extends KeyCondition {
-    override def condition:            Boolean = true
+    override def condition: Boolean            = true
     override def or(tooltip: Tooltip): Tooltip = tooltip
   }
 

@@ -21,6 +21,6 @@
 package net.katsstuff.mirror
 
 class CommonProxy {
-  private[mirror] def bakeRenderModels():  Unit = ()
+  private[mirror] def bakeRenderModels(): Unit  = ()
   private[mirror] def registerRenderers(): Unit = ()
 }

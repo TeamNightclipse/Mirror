@@ -70,7 +70,7 @@ trait ClientMessageHandler[A, Reply] extends MessageHandler[A, Reply] with HasCl
   def handle(netHandler: NetHandlerPlayClient, a: A): Option[Reply]
   override def handle(netHandler: INetHandler, a: A): Option[Reply] =
     handle(netHandler.asInstanceOf[NetHandlerPlayClient], a)
-  override def side:      Side            = Side.CLIENT
+  override def side: Side                 = Side.CLIENT
   override def scheduler: IThreadListener = Minecraft.getMinecraft
 }
 
@@ -90,6 +90,6 @@ trait ServerMessageHandler[A, Reply] extends MessageHandler[A, Reply] with HasSe
   def handle(netHandler: NetHandlerPlayServer, a: A): Option[Reply]
   override def handle(netHandler: INetHandler, a: A): Option[Reply] =
     handle(netHandler.asInstanceOf[NetHandlerPlayServer], a)
-  override def side:      Side            = Side.SERVER
+  override def side: Side                 = Side.SERVER
   override def scheduler: IThreadListener = FMLCommonHandler.instance().getMinecraftServerInstance
 }

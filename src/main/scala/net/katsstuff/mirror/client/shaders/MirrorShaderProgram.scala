@@ -80,7 +80,10 @@ case class MirrorShaderProgram(
 }
 object MirrorShaderProgram {
 
-  private[mirror] def missingShaderProgram(shaders: Seq[MirrorShader], uniforms: Map[String, UniformBase[_ <: UniformType]]) =
+  private[mirror] def missingShaderProgram(
+      shaders: Seq[MirrorShader],
+      uniforms: Map[String, UniformBase[_ <: UniformType]]
+  ) =
     MirrorShaderProgram(shaders, 0, uniforms.map { case (name, base) => name -> new NOOPUniform(base.tpe, base.count) })
 
   /**

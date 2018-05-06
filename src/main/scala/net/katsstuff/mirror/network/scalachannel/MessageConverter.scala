@@ -76,31 +76,31 @@ object MessageConverter {
 
   def create[A](read: ByteBuf => A)(write: (ByteBuf, A) => Unit): MessageConverter[A] = new MessageConverter[A] {
     override def writeBytes(a: A, buf: ByteBuf): Unit = write(buf, a)
-    override def readBytes(buf: ByteBuf):        A    = read(buf)
+    override def readBytes(buf: ByteBuf): A           = read(buf)
   }
 
   def createExtra[A](from: PacketBuffer => A)(to: (PacketBuffer, A) => Unit): MessageConverter[A] =
     create(buf => from(new PacketBuffer(buf)))((buf, a) => to(new PacketBuffer(buf), a))
 
   def write[A](a: A, buf: ByteBuf)(implicit converter: MessageConverter[A]): Unit = converter.writeBytes(a, buf)
-  def read[A](buf: ByteBuf)(implicit converter: MessageConverter[A]):        A    = converter.readBytes(buf)
+  def read[A](buf: ByteBuf)(implicit converter: MessageConverter[A]): A           = converter.readBytes(buf)
 
-  implicit val boolConverter:   MessageConverter[Boolean] = create(_.readBoolean())(_.writeBoolean(_))
-  implicit val byteConverter:   MessageConverter[Byte]    = create(_.readByte())(_.writeByte(_))
-  implicit val shortConverter:  MessageConverter[Short]   = create(_.readShort())(_.writeShort(_))
-  implicit val intConverter:    MessageConverter[Int]     = create(_.readInt())(_.writeInt(_))
-  implicit val longConverter:   MessageConverter[Long]    = create(_.readLong())(_.writeLong(_))
-  implicit val floatConverter:  MessageConverter[Float]   = create(_.readFloat())(_.writeFloat(_))
-  implicit val doubleConverter: MessageConverter[Double]  = create(_.readDouble())(_.writeDouble(_))
-  implicit val charConverter:   MessageConverter[Char]    = create(_.readChar())(_.writeChar(_))
+  implicit val boolConverter: MessageConverter[Boolean]  = create(_.readBoolean())(_.writeBoolean(_))
+  implicit val byteConverter: MessageConverter[Byte]     = create(_.readByte())(_.writeByte(_))
+  implicit val shortConverter: MessageConverter[Short]   = create(_.readShort())(_.writeShort(_))
+  implicit val intConverter: MessageConverter[Int]       = create(_.readInt())(_.writeInt(_))
+  implicit val longConverter: MessageConverter[Long]     = create(_.readLong())(_.writeLong(_))
+  implicit val floatConverter: MessageConverter[Float]   = create(_.readFloat())(_.writeFloat(_))
+  implicit val doubleConverter: MessageConverter[Double] = create(_.readDouble())(_.writeDouble(_))
+  implicit val charConverter: MessageConverter[Char]     = create(_.readChar())(_.writeChar(_))
 
-  implicit val stringConverter:   MessageConverter[String]   = createExtra(_.readString(32767))(_.writeString(_))
+  implicit val stringConverter: MessageConverter[String]     = createExtra(_.readString(32767))(_.writeString(_))
   implicit val blockPosConverter: MessageConverter[BlockPos] = createExtra(_.readBlockPos())(_.writeBlockPos(_))
   implicit val textConverter: MessageConverter[ITextComponent] =
     createExtra(_.readTextComponent())(_.writeTextComponent(_))
-  implicit val uuidConverter:  MessageConverter[UUID]           = createExtra(_.readUniqueId())(_.writeUniqueId(_))
-  implicit val tagConverter:   MessageConverter[NBTTagCompound] = createExtra(_.readCompoundTag())(_.writeCompoundTag(_))
-  implicit val stackConverter: MessageConverter[ItemStack]      = createExtra(_.readItemStack())(_.writeItemStack(_))
+  implicit val uuidConverter: MessageConverter[UUID]          = createExtra(_.readUniqueId())(_.writeUniqueId(_))
+  implicit val tagConverter: MessageConverter[NBTTagCompound] = createExtra(_.readCompoundTag())(_.writeCompoundTag(_))
+  implicit val stackConverter: MessageConverter[ItemStack]    = createExtra(_.readItemStack())(_.writeItemStack(_))
   implicit val resourceLocationConverter: MessageConverter[ResourceLocation] =
     createExtra(_.readResourceLocation())(_.writeResourceLocation(_))
 
@@ -141,7 +141,7 @@ object MessageConverter {
 
   implicit val hNilConverter: MessageConverter[HNil] = new MessageConverter[HNil] {
     override def writeBytes(a: HNil, buf: ByteBuf): Unit = ()
-    override def readBytes(buf: ByteBuf):           HNil = HNil
+    override def readBytes(buf: ByteBuf): HNil           = HNil
   }
 
   implicit def hConsConverter[H, T <: HList](
@@ -196,11 +196,11 @@ object MessageConverter {
       converter: Lazy[MessageConverter[Repr]]
   ): MessageConverter[A] = new MessageConverter[A] {
     override def writeBytes(a: A, buf: ByteBuf): Unit = converter.value.writeBytes(gen.to(a), buf)
-    override def readBytes(buf: ByteBuf):        A    = gen.from(converter.value.readBytes(buf))
+    override def readBytes(buf: ByteBuf): A           = gen.from(converter.value.readBytes(buf))
   }
 
   implicit class Ops(val buffer: ByteBuf) extends AnyVal {
     def write[A: MessageConverter](obj: A): Unit = MessageConverter.write[A](obj, buffer)
-    def read[A: MessageConverter]:          A    = MessageConverter.read[A](buffer)
+    def read[A: MessageConverter]: A             = MessageConverter.read[A](buffer)
   }
 }

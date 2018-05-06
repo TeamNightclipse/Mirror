@@ -89,10 +89,9 @@ class MirrorArrayBuffer(count: Int, target: Int, usage: Int) {
   /**
     * Deletes this buffer. Be careful about using this one.
     */
-  def delete(): Unit = {
+  def delete(): Unit =
     if (!deleted) {
       OpenGlHelper.glDeleteBuffers(id)
       deleted = true
     }
-  }
 }

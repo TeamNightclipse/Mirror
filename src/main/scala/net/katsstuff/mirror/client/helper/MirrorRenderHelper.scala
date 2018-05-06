@@ -300,12 +300,11 @@ object MirrorRenderHelper {
   /**
     * Registers a resource manager reload listener if possible.
     */
-  def registerResourceReloadListener(listener: IResourceManagerReloadListener): Unit = {
+  def registerResourceReloadListener(listener: IResourceManagerReloadListener): Unit =
     Minecraft.getMinecraft.getResourceManager match {
       case resourceManager: SimpleReloadableResourceManager => resourceManager.registerReloadListener(listener)
       case _                                                => listener.onResourceManagerReload(Minecraft.getMinecraft.getResourceManager)
     }
-  }
 
   /**
     * Renders an itemstack.

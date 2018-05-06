@@ -45,7 +45,7 @@ class MirrorUniform[+Type <: UniformType](
     floatBuffer: FloatBuffer
 ) {
   var dirty = false
-  
+
   def setIdx(f: Float, idx: Int): Unit = {
     floatBuffer.position(0)
     floatBuffer.put(idx, f)
@@ -260,12 +260,11 @@ class MirrorUniform[+Type <: UniformType](
 
   def set(matrix: Matrix4f): Unit = setIdx(matrix, 0)
 
-  def upload(): Unit = {
+  def upload(): Unit =
     if (dirty) {
       dirty = false
       tpe.upload(location, intBuffer, floatBuffer)
     }
-  }
 }
 object MirrorUniform {
 
@@ -360,14 +359,14 @@ object UniformType {
 case class UniformBase[+Type <: UniformType](tpe: Type, count: Int)
 
 class NOOPUniform(tpe: UniformType, count: Int) extends MirrorUniform(0, tpe, count, null, null) {
-  override def setIdx(f: Float, idx: Int):                                   Unit = ()
-  override def setIdx(f1: Float, f2: Float, idx: Int):                       Unit = ()
-  override def setIdx(f1: Float, f2: Float, f3: Float, idx: Int):            Unit = ()
+  override def setIdx(f: Float, idx: Int): Unit                                   = ()
+  override def setIdx(f1: Float, f2: Float, idx: Int): Unit                       = ()
+  override def setIdx(f1: Float, f2: Float, f3: Float, idx: Int): Unit            = ()
   override def setIdx(f1: Float, f2: Float, f3: Float, f4: Float, idx: Int): Unit = ()
 
-  override def setIdx(i: Int, idx: Int):                             Unit = ()
-  override def setIdx(i1: Int, i2: Int, idx: Int):                   Unit = ()
-  override def setIdx(i1: Int, i2: Int, i3: Int, idx: Int):          Unit = ()
+  override def setIdx(i: Int, idx: Int): Unit                             = ()
+  override def setIdx(i1: Int, i2: Int, idx: Int): Unit                   = ()
+  override def setIdx(i1: Int, i2: Int, i3: Int, idx: Int): Unit          = ()
   override def setIdx(i1: Int, i2: Int, i3: Int, i4: Int, idx: Int): Unit = ()
 
   override def setIdx(

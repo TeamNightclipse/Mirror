@@ -34,12 +34,12 @@ object MirrorOpenGLHelper {
   private val contextcapabilities = GLContext.getCapabilities
   private val arbVbo              = !contextcapabilities.OpenGL15 && contextcapabilities.GL_ARB_vertex_buffer_object
 
-  val GL_STREAM_DRAW:  Int = assignVboValue(GL15.GL_STREAM_DRAW, ARBBufferObject.GL_STREAM_DRAW_ARB)
-  val GL_STREAM_READ:  Int = assignVboValue(GL15.GL_STREAM_READ, ARBBufferObject.GL_STREAM_READ_ARB)
-  val GL_STREAM_COPY:  Int = assignVboValue(GL15.GL_STREAM_COPY, ARBBufferObject.GL_STREAM_COPY_ARB)
-  val GL_STATIC_DRAW:  Int = assignVboValue(GL15.GL_STATIC_DRAW, ARBBufferObject.GL_STATIC_DRAW_ARB)
-  val GL_STATIC_READ:  Int = assignVboValue(GL15.GL_STATIC_READ, ARBBufferObject.GL_STATIC_READ_ARB)
-  val GL_STATIC_COPY:  Int = assignVboValue(GL15.GL_STATIC_COPY, ARBBufferObject.GL_STATIC_COPY_ARB)
+  val GL_STREAM_DRAW: Int  = assignVboValue(GL15.GL_STREAM_DRAW, ARBBufferObject.GL_STREAM_DRAW_ARB)
+  val GL_STREAM_READ: Int  = assignVboValue(GL15.GL_STREAM_READ, ARBBufferObject.GL_STREAM_READ_ARB)
+  val GL_STREAM_COPY: Int  = assignVboValue(GL15.GL_STREAM_COPY, ARBBufferObject.GL_STREAM_COPY_ARB)
+  val GL_STATIC_DRAW: Int  = assignVboValue(GL15.GL_STATIC_DRAW, ARBBufferObject.GL_STATIC_DRAW_ARB)
+  val GL_STATIC_READ: Int  = assignVboValue(GL15.GL_STATIC_READ, ARBBufferObject.GL_STATIC_READ_ARB)
+  val GL_STATIC_COPY: Int  = assignVboValue(GL15.GL_STATIC_COPY, ARBBufferObject.GL_STATIC_COPY_ARB)
   val GL_DYNAMIC_DRAW: Int = assignVboValue(GL15.GL_DYNAMIC_DRAW, ARBBufferObject.GL_DYNAMIC_DRAW_ARB)
   val GL_DYNAMIC_READ: Int = assignVboValue(GL15.GL_DYNAMIC_READ, ARBBufferObject.GL_DYNAMIC_READ_ARB)
   val GL_DYNAMIC_COPY: Int = assignVboValue(GL15.GL_DYNAMIC_COPY, ARBBufferObject.GL_DYNAMIC_COPY_ARB)

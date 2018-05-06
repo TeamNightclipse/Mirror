@@ -38,6 +38,6 @@ case class IdState[A](run: Int => (Int, A)) {
 }
 
 object IdState {
-  def init:                       IdState[Int] = IdState(i => (i, i))
-  def run0[A](state: IdState[A]): A            = state.run(0)._2
+  def init: IdState[Int]            = IdState(i => (i, i))
+  def run0[A](state: IdState[A]): A = state.run(0)._2
 }

@@ -43,12 +43,11 @@ case class MirrorShader(id: Int, shaderType: ShaderType) {
   /**
     * Deletes this shader. Be very careful when using this.
     */
-  def delete(): Unit = {
+  def delete(): Unit =
     if (!deleted) {
       OpenGlHelper.glDeleteShader(id)
       deleted = true
     }
-  }
 }
 object MirrorShader {
 

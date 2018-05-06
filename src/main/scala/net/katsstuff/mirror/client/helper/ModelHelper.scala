@@ -71,10 +71,9 @@ object ModelHelper {
     registerModel(item, clazz)
   }
 
-  def registerModel[T <: Enum[T] with IStringSerializable](item: Item, clazz: Class[T]): Unit = {
+  def registerModel[T <: Enum[T] with IStringSerializable](item: Item, clazz: Class[T]): Unit =
     for (t <- clazz.getEnumConstants) {
       val mrl = new MRL(s"${item.getRegistryName}_${t.getName}", "inventory")
       ModelLoader.setCustomModelResourceLocation(item, t.ordinal, mrl)
     }
-  }
 }

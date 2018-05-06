@@ -16,7 +16,7 @@ import org.lwjgl.util.vector.Vector4f
 
 @SideOnly(Side.CLIENT)
 object QuadBuilder {
-  def apply(format: VertexFormat):      QuadBuilder = new QuadBuilder(format)
+  def apply(format: VertexFormat): QuadBuilder      = new QuadBuilder(format)
   def withFormat(format: VertexFormat): QuadBuilder = new QuadBuilder(format)
 }
 @SideOnly(Side.CLIENT)
@@ -141,7 +141,7 @@ class QuadBuilder private (
 
   def rotate(axis: EnumFacing.Axis, angle: Float): QuadBuilder = {
     import Vector3.WrappedVec3i
-    val quat = Quat.fromAxisAngle(axis, angle)
+    val quat                                        = Quat.fromAxisAngle(axis, angle)
     val newMap: mutable.Map[EnumFacing, QuadHolder] = mutable.Map()
     facingMap.foreach {
       case (k: EnumFacing, v: QuadHolder) =>
