@@ -20,6 +20,7 @@
  */
 package net.katsstuff.mirror.client.helper
 
+import java.text.NumberFormat
 import java.util
 import java.util.function.BooleanSupplier
 
@@ -28,6 +29,7 @@ import scala.collection.JavaConverters._
 import scala.language.implicitConversions
 
 import net.katsstuff.mirror.scalastuff.MirrorImplicits._
+import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.resources.I18n
 import net.minecraft.util.text.TextFormatting
@@ -38,6 +40,11 @@ import net.minecraft.util.text.TextFormatting
   * @param lines The finished lines.
   */
 case class Tooltip(objs: Seq[String], lines: Seq[String]) {
+
+  def numberFormat: NumberFormat = {
+    val locale = Minecraft.getMinecraft.getLanguageManager.getCurrentLanguage.getJavaLocale
+    NumberFormat.getNumberInstance(locale)
+  }
 
   /**
     * Starts a condition.
@@ -70,6 +77,15 @@ case class Tooltip(objs: Seq[String], lines: Seq[String]) {
     Tooltip(objs ++ formats.map(_.toString) :+ String.valueOf(obj), lines)
 
   /**
+    * Adds a number to the current line and formats it according to the current language.
+    * @param num The number to add.
+    * @param formats The formatting to use.
+    * @return A tooltip builder with the number added.
+    */
+  def addNum(num: Double, formats: TextFormatting*): Tooltip =
+    add(numberFormat.format(num), formats: _*)
+
+  /**
     * Adds a localized string to the current line, followed by a bunch of formatting.
     * @param i18n The localization key for the string to add.
     * @param formats The formatting to use.
@@ -77,6 +93,11 @@ case class Tooltip(objs: Seq[String], lines: Seq[String]) {
     */
   @varargs def addI18n(i18n: String, formats: TextFormatting*): Tooltip =
     add(I18n.format(i18n), formats: _*)
+
+  /**
+    * Adds a space on the current line.
+    */
+  def space: Tooltip = add(" ")
 
   /**
     * Finishes the current line and adds that line to the finished lines.
