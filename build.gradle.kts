@@ -22,16 +22,17 @@ buildscript {
     }
 }
 
-apply {
-    plugin("net.minecraftforge.gradle.forge")
-}
-
 plugins {
     scala
     //We apply these to get pretty build script
     java
     idea
-    id("com.github.johnrengelman.shadow").version("2.0.4")
+    //id("com.github.johnrengelman.shadow").version("2.0.4").apply(false)
+}
+
+apply {
+    plugin("net.minecraftforge.gradle.forge")
+    plugin("com.github.johnrengelman.shadow")
 }
 
 val configFile = file("build.properties")
@@ -145,8 +146,6 @@ reobf {
         mappingType = ReobfMappingType.SEARGE
     }
 }
-
-
 
 tasks.get("reobfShadowJar").mustRunAfter("shadowJar")
 tasks.get("build").dependsOn("reobfShadowJar")
