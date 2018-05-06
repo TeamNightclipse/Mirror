@@ -1,6 +1,8 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import groovy.util.ConfigObject
 import groovy.util.ConfigSlurper
 import net.minecraftforge.gradle.user.IReobfuscator
+import net.minecraftforge.gradle.user.ReobfMappingType
 import net.minecraftforge.gradle.user.ReobfTaskFactory
 import net.minecraftforge.gradle.user.patcherUser.forge.ForgeExtension
 import org.gradle.api.internal.HasConvention
@@ -29,6 +31,7 @@ plugins {
     //We apply these to get pretty build script
     java
     idea
+    id("com.github.johnrengelman.shadow").version("2.0.4")
 }
 
 val configFile = file("build.properties")
@@ -77,25 +80,24 @@ configure<ForgeExtension> {
     replaceIn("Mirror.scala")
 }
 
-val reobf: NamedDomainObjectContainer<IReobfuscator> by extensions
-
-reobf {
-    "jar" {
-        extraLines.add("PK: shapeless net/katsstuff/mirror/shade/shapeless")
-    }
-}
-
-val shade by configurations.creating
-configurations.compile.extendsFrom(shade)
-
 dependencies {
-    shade("com.chuusai:shapeless_2.11:2.3.3") {
+    compile("com.chuusai:shapeless_2.11:2.3.3") {
         exclude(group = "org.scala-lang")
     }
 
     testCompile("junit:junit:4.12")
     testCompile("org.scalatest:scalatest_2.11:3.0.1")
     testCompile("org.scalacheck:scalacheck_2.11:1.13.4")
+}
+
+tasks.withType<ShadowJar> {
+    classifier = ""
+    dependencies {
+        include(dependency("com.chuusai:shapeless_2.11:2.3.3"))
+        exclude(dependency("org.scala-lang:scala-library:2.11.1"))
+    }
+    exclude("dummyThing")
+    relocate("shapeless", "net.katsstuff.mirror.shade.shapeless")
 }
 
 tasks.withType<ProcessResources> {
@@ -109,14 +111,6 @@ tasks.withType<ProcessResources> {
 
     from(mainSourceSet.resources.srcDirs) {
         exclude("mcmod.info")
-    }
-}
-
-tasks.withType<Jar> {
-    shade.forEach { dep ->
-        from(project.zipTree(dep)) {
-            exclude("META-INF", "META-INF/**")
-        }
     }
 }
 
@@ -137,5 +131,24 @@ fun parseConfig(config: File): ConfigObject {
 }
 
 idea.module.inheritOutputDirs = true
+
+val reobf: NamedDomainObjectContainer<IReobfuscator> by extensions
+
+tasks.get("build").dependsOn("shadowJar")
+
+artifacts {
+    add("archives", tasks.get("shadowJar"))
+}
+
+reobf {
+    "shadowJar" {
+        mappingType = ReobfMappingType.SEARGE
+    }
+}
+
+
+
+tasks.get("reobfShadowJar").mustRunAfter("shadowJar")
+tasks.get("build").dependsOn("reobfShadowJar")
 
 defaultTasks("clean", "build", "incrementBuildNumber")
