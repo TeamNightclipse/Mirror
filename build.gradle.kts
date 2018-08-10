@@ -22,59 +22,59 @@ buildscript {
     }
 }
 
+apply {
+    plugin("net.minecraftforge.gradle.forge")
+}
+
 plugins {
     scala
     //We apply these to get pretty build script
     java
     idea
-    //id("com.github.johnrengelman.shadow").version("2.0.4").apply(false)
+    maven
+    signing
+    id("com.github.johnrengelman.shadow").version("2.0.4")
 }
 
-apply {
-    plugin("net.minecraftforge.gradle.forge")
-    plugin("com.github.johnrengelman.shadow")
-}
+val scaladoc: ScalaDoc by tasks
+val compileJava: JavaCompile by tasks
+val compileScala: ScalaCompile by tasks
+val shadowJar: ShadowJar by tasks
 
-val configFile = file("build.properties")
-val config = parseConfig(configFile)
+val config = parseConfig(file("build.properties"))
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
-tasks.withType<JavaCompile> {
-    options.encoding = "UTF-8"
-}
+compileJava.options.encoding = "UTF-8"
+compileScala.scalaCompileOptions.additionalParameters = listOf("-Xexperimental")
+scaladoc.scalaDocOptions.additionalParameters = listOf("-Xexperimental")
 
-tasks.withType<ScalaCompile> {
-    scalaCompileOptions.additionalParameters = listOf("-Xexperimental")
-}
-
-version = "${config["mc_version"]}-${config["version"]}-${config["build_number"]}"
-group = "net.katsstuff"
+version = "${config["mc_version"]}-${config["version"]}"
+group = "net.katsstuff.teamnightclipse"
 base.archivesBaseName = "mirror"
 
-val mainSourceSet = java.sourceSets.get("main")
-val javaSourceSet = mainSourceSet.java
-val scalaSourceSet = (mainSourceSet as HasConvention).convention.getPlugin<ScalaSourceSet>().scala
-
-//Join compilation
-scalaSourceSet.srcDir("src/main/java")
-javaSourceSet.setSrcDirs(listOf<File>())
+java.sourceSets {
+    "main" {
+        //Join compilation
+        java {
+            setSrcDirs(listOf<File>())
+        }
+        withConvention(ScalaSourceSet::class) {
+            scala {
+                srcDir("src/main/java")
+            }
+        }
+    }
+}
 
 val minecraft = the<ForgeExtension>()
-
-configure<ForgeExtension> {
+minecraft.apply {
     version = "${config["mc_version"]}-${config["forge_version"]}"
     runDir = if (file("../run1.12").exists()) "../run1.12" else "run"
-
-    // the mappings can be changed at any time, and must be in the following format.
-    // snapshot_YYYYMMDD   snapshot are built nightly.
-    // stable_#            stables are built at the discretion of the MCP team.
-    // Use non-default mappings at your own risk. they may not allways work.
-    // simply re-run your setup task after changing the mappings to update your workspace.
-    mappings = "snapshot_20171128"
+    mappings = "snapshot_20180810"
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 
     replace("@VERSION@", project.version)
@@ -91,56 +91,27 @@ dependencies {
     testCompile("org.scalacheck:scalacheck_2.11:1.13.4")
 }
 
-tasks.withType<ShadowJar> {
-    classifier = ""
+shadowJar.apply {
+    classifier = "shaded"
     dependencies {
         include(dependency("com.chuusai:shapeless_2.11:2.3.3"))
         exclude(dependency("org.scala-lang:scala-library:2.11.1"))
     }
     exclude("dummyThing")
-    relocate("shapeless", "net.katsstuff.mirror.shade.shapeless")
+    relocate("shapeless", "net.katsstuff.teamnightclipse.mirror.shade.shapeless")
 }
 
 tasks.withType<ProcessResources> {
     inputs.property("version", project.version)
     inputs.property("mcversion", minecraft.version)
 
-    from(mainSourceSet.resources.srcDirs) {
+    from(java.sourceSets["main"].resources.srcDirs) {
         include("mcmod.info")
         expand(mapOf("version" to project.version, "mcversion" to minecraft.version))
     }
 
-    from(mainSourceSet.resources.srcDirs) {
+    from(java.sourceSets["main"].resources.srcDirs) {
         exclude("mcmod.info")
-    }
-}
-
-idea.module.inheritOutputDirs = true
-
-val reobf: NamedDomainObjectContainer<IReobfuscator> by extensions
-
-tasks.get("build").dependsOn("shadowJar")
-
-artifacts {
-    add("archives", tasks.get("shadowJar"))
-}
-
-reobf {
-    "shadowJar" {
-        mappingType = ReobfMappingType.SEARGE
-    }
-}
-
-tasks.get("reobfShadowJar").mustRunAfter("shadowJar")
-tasks.get("build").dependsOn("reobfShadowJar")
-
-tasks {
-    "incrementBuildNumber" {
-        dependsOn("reobfShadowJar")
-        doLast {
-            config["build_number"] = config["build_number"].toString().toInt() + 1
-            config.toProperties().store(configFile.writer(), "")
-        }
     }
 }
 
@@ -150,4 +121,103 @@ fun parseConfig(config: File): ConfigObject {
     return ConfigSlurper().parse(prop)
 }
 
-defaultTasks("clean", "build", "incrementBuildNumber")
+idea.module.inheritOutputDirs = true
+
+val reobf: NamedDomainObjectContainer<IReobfuscator> by extensions
+
+tasks["build"].dependsOn(shadowJar)
+
+reobf {
+    "shadowJar" {
+        mappingType = ReobfMappingType.SEARGE
+    }
+}
+
+tasks["reobfShadowJar"].mustRunAfter(shadowJar)
+tasks["build"].dependsOn("reobfShadowJar")
+
+val deobfJar by tasks.creating(Jar::class) {
+    classifier = "dev"
+    from(java.sourceSets["main"].output)
+}
+
+val sourcesJar by tasks.creating(Jar::class) {
+    classifier = "sources"
+    from(java.sourceSets["main"].allSource)
+}
+
+val javadocJar by tasks.creating(Jar::class) {
+    classifier = "javadoc"
+    dependsOn(scaladoc)
+    from(scaladoc.destinationDir)
+}
+
+artifacts {
+    add("archives", shadowJar)
+    add("archives", sourcesJar)
+    add("archives", javadocJar)
+    add("archives", deobfJar)
+}
+
+signing {
+    sign(configurations.archives)
+}
+
+tasks {
+    "uploadArchives"(Upload::class) {
+        repositories {
+            withConvention(MavenRepositoryHandlerConvention::class) {
+                mavenDeployer {
+                    beforeDeployment {
+                        signing.signPom(this)
+                    }
+
+                    withGroovyBuilder {
+                        val releasesUri = """https://api.bintray.com/maven/team-nightclipse/maven/Mirror/;publish=1"""
+                        "repository"("url" to uri(releasesUri)) {
+                            "authentication"("userName" to properties["bintray.user"], "password" to properties["bintray.apikey"])
+                        }
+                        /*
+                        "snapshotRepository"("url" to uri("TODO")) {
+                            "authentication"("userName" to properties["bintray.user"], "password" to properties["bintray.apikey"])
+                        }
+                        */
+                    }
+
+                    pom.project {
+                        withGroovyBuilder {
+                            "description"("A Minecraft rendering library")
+
+                            "licenses" {
+                                "license" {
+                                    "name"("MIT")
+                                    "url"("http://opensource.org/licenses/MIT")
+                                    "distribution"("repo")
+                                }
+                            }
+
+                            "scm" {
+                                "url"("https://github.com/TeamNightclipse/Mirror")
+                                "connection"("scm:git:github.com/TeamNightclipse/Mirror")
+                                "developerConnection"("scm:git:github.com/TeamNightclipse/Mirror")
+                            }
+
+                            "issueManagement" {
+                                "system"("github")
+                                "url"("https://github.com/TeamNightclipse/Mirror/issues")
+                            }
+
+                            "developers" {
+                                "developer" {
+                                    "id"("Nikolai Frid")
+                                    "email"("katrix97@hotmail.com")
+                                    "url"("http://katsstuff.net/")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
