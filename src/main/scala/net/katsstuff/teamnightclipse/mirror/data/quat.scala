@@ -174,11 +174,28 @@ sealed abstract class AbstractQuat { self =>
   /**
 		* Creates a rotated vec from the passed in vec.
 		*/
-  //TODO: Find a more efficient solution
   def rotate(vec3: AbstractVector3): vec3.Self = {
-    val pure       = Quat(vec3.x, vec3.y, vec3.z, 0)
-    val multiplied = this * pure * this.conjugate
-    vec3.create(multiplied.x, multiplied.y, multiplied.z)
+    val vx = vec3.x
+    val vy = vec3.y
+    val vz = vec3.z
+    val rx = this.x
+    val ry = this.y
+    val rz = this.z
+    val rw = this.w
+
+    val tx = 2 * (ry * vz - rz * vy)
+    val ty = 2 * (rz * vx - rx * vz)
+    val tz = 2 * (rx * vy - ry * vx)
+
+    val cx = ry * tz - rz * ty
+    val cy = rz * tx - rx * tz
+    val cz = rx * ty - ry * tx
+
+    val newX = vx + rw * tx + cx
+    val newY = vy + rw * ty + cy
+    val newZ = vz + rw * tz + cz
+
+    vec3.create(newX, newY, newZ)
   }
 
   def *(vec3: AbstractVector3): vec3.Self = rotate(vec3)
