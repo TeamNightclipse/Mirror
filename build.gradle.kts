@@ -135,6 +135,7 @@ artifacts {
 }
 
 signing {
+    useGpgCmd()
     sign(configurations.archives)
 }
 
