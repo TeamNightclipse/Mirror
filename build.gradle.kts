@@ -54,6 +54,7 @@ minecraft {
     mappings = "stable_39"
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 
+    //Not working anymore, set it manually
     replace("@VERSION@", project.version)
     replaceIn("Mirror.scala")
 }
