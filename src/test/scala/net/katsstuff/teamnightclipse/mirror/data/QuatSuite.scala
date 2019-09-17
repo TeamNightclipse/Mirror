@@ -30,10 +30,19 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 @RunWith(classOf[JUnitRunner])
 class QuatSuite extends FunSuite with Matchers with GeneratorDrivenPropertyChecks {
 
-  final val Epsilon = 1E5
+  final val Epsilon = 1E2
 
-  implicit val doubleEquality: Equality[Double] = TolerantNumerics.tolerantDoubleEquality(1E-5)
+  implicit val doubleEquality: Equality[Double] = TolerantNumerics.tolerantDoubleEquality(1E-2)
   implicit val floatEquality: Equality[Float]   = TolerantNumerics.tolerantFloatEquality(1E-2.toFloat)
+
+  //noinspection ConvertExpressionToSAM
+  implicit val vecEquality: Equality[Vector3] = new Equality[Vector3] {
+    override def areEqual(a: Vector3, b: Any): Boolean = b match {
+      case b: AbstractVector3 =>
+        doubleEquality.areEqual(a.x, b.x) && doubleEquality.areEqual(a.y, b.y) && doubleEquality.areEquivalent(a.z, b.z)
+      case _ => false
+    }
+  }
 
   val saneDouble: Gen[Double] = Gen.choose(-Epsilon, Epsilon)
   val angleFloat: Gen[Float]  = Gen.choose(0F, 360F)
@@ -93,8 +102,38 @@ class QuatSuite extends FunSuite with Matchers with GeneratorDrivenPropertyCheck
 
   test("v rotated = qvq*") {
     forAll(randPos, randQuat) { (v: Vector3, q: Quat) =>
+      def quatMult[A: Numeric](x1: A, y1: A, z1: A, w1: A)(
+          x2: A,
+          y2: A,
+          z2: A,
+          w2: A
+      ) = {
+        val num = implicitly[Numeric[A]]
+        import num.mkNumericOps
+        val newX = w1 * x2 + x1 * w2 + y1 * z2 - z1 * y2
+        val newY = w1 * y2 + y1 * w2 + z1 * x2 - x1 * z2
+        val newZ = w1 * z2 + z1 * w2 + x1 * y2 - y1 * x2
+        val newW = w1 * w2 - x1 * x2 - y1 * y2 - z1 * z2
+        (newX, newY, newZ, newW)
+      }
+
+      def quatConjugate[A: Numeric](x: A, y: A, z: A, w: A) = {
+        val num = implicitly[Numeric[A]]
+        import num.mkNumericOps
+        (-x, -y, -z, w)
+      }
+
+      val bdPure = {
+        def bd(num: Double): BigDecimal = BigDecimal(num)
+
+        val (qcx, qcy, qcz, qcw) = quatConjugate(bd(q.x), bd(q.y), bd(q.z), bd(q.w))
+        val (mx, my, mz, mw)     = quatMult(bd(q.x), bd(q.y), bd(q.z), bd(q.w))(bd(v.x), bd(v.y), bd(v.z), bd(0))
+        val (rx, ry, rz, rw)     = quatMult(mx, my, mz, mw)(qcx, qcy, qcz, qcw)
+        Quat(rx.toDouble, ry.toDouble, rz.toDouble, rw.toDouble)
+      }
+
       val pure = q * Quat(v.x, v.y, v.z, 0) * q.conjugate
-      q * v shouldEqual Vector3(pure.x, pure.y, pure.z)
+      q * v shouldEqual Vector3(bdPure.x, bdPure.y, bdPure.z)
     }
   }
 
