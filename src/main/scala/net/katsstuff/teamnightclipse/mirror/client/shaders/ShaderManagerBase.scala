@@ -22,30 +22,30 @@ package net.katsstuff.teamnightclipse.mirror.client.shaders
 
 import java.io.IOException
 import java.util
-import java.util.function.Consumer
+import java.util.function.{Consumer, Predicate}
 
-import scala.collection.mutable
 import scala.collection.JavaConverters._
+import scala.collection.mutable
 import scala.util.control.NonFatal
 
 import net.katsstuff.teamnightclipse.mirror.client.helper.MirrorRenderHelper
 import net.katsstuff.teamnightclipse.mirror.client.shaders.ShaderProgramKey.mapUniforms
 import net.katsstuff.teamnightclipse.mirror.helper.MirrorLogHelper
 import net.minecraft.client.Minecraft
-import net.minecraft.client.resources.{IResourceManager, IResourceManagerReloadListener}
+import net.minecraft.client.resources.IResourceManager
 import net.minecraft.crash.CrashReport
 import net.minecraft.util.{ReportedException, ResourceLocation}
+import net.minecraftforge.client.resource.{IResourceType, ISelectiveResourceReloadListener, VanillaResourceType}
 import net.minecraftforge.fml.common.ProgressManager
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 import shapeless._
-import shapeless.ops.record.MapValues
 
 /**
   * A class used for managing shaders. Similar to Minecraft, [[net.minecraft.client.renderer.texture.TextureManager]].
   * @param resourceManager The [[IResourceManager]] to use for loading shaders.
   */
 @SideOnly(Side.CLIENT)
-class ShaderManagerBase(resourceManager: IResourceManager) extends IResourceManagerReloadListener {
+class ShaderManagerBase(resourceManager: IResourceManager) extends ISelectiveResourceReloadListener {
   private val shaderPrograms = mutable.Map.empty[ShaderProgramKey[_ <: HList], MirrorShaderProgram]
   private val shaderProgramsInits = {
     type ShaderInit = MirrorShaderProgram => Unit
@@ -254,7 +254,10 @@ class ShaderManagerBase(resourceManager: IResourceManager) extends IResourceMana
     shaderPrograms.get(key).map(program => MirrorShaderProgram.TypeLevelProgram(program, key.uniforms.get))
   }
 
-  override def onResourceManagerReload(resourceManager: IResourceManager): Unit = {
+  override def onResourceManagerReload(
+      resourceManager: IResourceManager,
+      resourcePredicate: Predicate[IResourceType]
+  ): Unit = if (resourcePredicate.test(VanillaResourceType.SHADERS)) {
     val reloadBar = ProgressManager.push("Reloading Shader Manager", 0)
 
     val shaderBar = ProgressManager.push("Reloading shaders", shaderObjects.size)
@@ -281,6 +284,7 @@ class ShaderManagerBase(resourceManager: IResourceManager) extends IResourceMana
     }
 
     shaderPrograms ++= res
+    ProgressManager.pop(programBar)
     ProgressManager.pop(reloadBar)
   }
 }
