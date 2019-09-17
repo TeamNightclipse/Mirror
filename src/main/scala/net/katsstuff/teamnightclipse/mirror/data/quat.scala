@@ -501,6 +501,9 @@ object MutableQuat {
     MutableQuat(x, y, z, w)
   }
 
+  def orientationOfVec(direction: Vector3): MutableQuat =
+    fromEulerRad(direction.yawRad.toFloat, direction.pitchRad.toFloat, 0F)
+
   def orientationOf(entity: Entity): MutableQuat = fromEuler(entity.rotationYaw, entity.rotationPitch, 0F)
 
   def lookRotation(forward: AbstractVector3, up: AbstractVector3): MutableQuat = {
@@ -651,6 +654,9 @@ object Quat {
 
     Quat(x, y, z, w)
   }
+
+  def orientationOfVec(direction: Vector3): Quat =
+    fromEulerRad(direction.yawRad.toFloat, direction.pitchRad.toFloat, 0F)
 
   def orientationOf(entity: Entity): Quat = fromEuler(entity.rotationYaw, entity.rotationPitch, 0F)
 
