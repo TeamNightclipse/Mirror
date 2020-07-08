@@ -30,6 +30,7 @@ import net.minecraft.client.renderer.{GLAllocation, GlStateManager, OpenGlHelper
 import net.minecraft.client.resources.{IResourceManagerReloadListener, SimpleReloadableResourceManager}
 import net.minecraft.item.{ItemBlock, ItemStack}
 import net.minecraft.util.math.MathHelper
+import net.minecraftforge.client.resource.ISelectiveResourceReloadListener
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 //Many render methods adopted from GLU classes
@@ -300,7 +301,7 @@ object MirrorRenderHelper {
   /**
     * Registers a resource manager reload listener if possible.
     */
-  def registerResourceReloadListener(listener: IResourceManagerReloadListener): Unit =
+  def registerResourceReloadListener(listener: ISelectiveResourceReloadListener): Unit =
     Minecraft.getMinecraft.getResourceManager match {
       case resourceManager: SimpleReloadableResourceManager => resourceManager.registerReloadListener(listener)
       case _                                                => listener.onResourceManagerReload(Minecraft.getMinecraft.getResourceManager)

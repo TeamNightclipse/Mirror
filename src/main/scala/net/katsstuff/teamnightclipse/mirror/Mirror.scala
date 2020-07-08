@@ -31,7 +31,7 @@ import net.minecraftforge.fml.common.{Mod, SidedProxy}
 object Mirror {
   final val Id          = "mirror"
   final val Name        = "Mirror"
-  final val Version     = "0.4"
+  final val Version     = "0.5.1"
   final val CommonProxy = "net.katsstuff.teamnightclipse.mirror.CommonProxy"
   final val ClientProxy = "net.katsstuff.teamnightclipse.mirror.client.ClientProxy"
 

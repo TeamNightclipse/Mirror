@@ -51,7 +51,7 @@ case class VBOModel(format: VertexFormat, arrayBuffer: MirrorArrayBuffer, vertex
       arrayBuffer.bindBuffer()
 
       for (i <- elements.indices) {
-        preDraw(elements(i).getUsage, format, i, format.getSize)
+        preDraw(elements(i).getUsage, format, i, format.getElementCount)
       }
 
       arrayBuffer.drawArrays(mode)

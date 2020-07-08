@@ -96,13 +96,13 @@ object MirrorShader {
             new ResourceLocation(file)
           } else {
             resource.getInputStream
-            val path      = location.getPath
+            val path      = location.getResourcePath
             val folderIdx = path.lastIndexOf('/')
             if (folderIdx != -1) {
               val folder = path.substring(0, folderIdx)
-              new ResourceLocation(location.getNamespace, s"$folder/$file")
+              new ResourceLocation(location.getResourceDomain, s"$folder/$file")
             } else {
-              new ResourceLocation(location.getNamespace, file)
+              new ResourceLocation(location.getResourceDomain, file)
             }
           }
 
